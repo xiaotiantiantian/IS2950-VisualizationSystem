@@ -1,26 +1,23 @@
 <%-- 
-    Document   : upload
-    Created on : 2017-01-22, 19:56:50
+    Document   : done
+    Created on : 2017-01-28, 20:04:54
     Author     : Zhirun Tian
 --%>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-         pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+         pageEncoding="ISO-8859-1"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-
 <%
     //check whether the role ID of the user has priviledge for current page
 //    if (request.getSession().getAttribute("userName") == null) {
 //        response.sendRedirect("login.jsp");
-//       request.getSession().setAttribute("userName") request.getSession().getId()
 //    }
 %>
 
 <html>
-
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Upload New Data</title>
+        <title>You have made some change</title>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
     </head>
@@ -41,11 +38,10 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
+
                     <li><a href="showData.jsp">Show Data</a></li>
 
-                    <li class="active"><a href="upload.jsp">Upload New Data</a></li>
-
-
+                    <li><a href="upload.jsp">Upload New Data</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <!--put the name on the navigation bar-->
@@ -67,49 +63,19 @@
     <div class="container" style="margin-top:100px;margin-bottom:250px;">
 
         <div class="page-header">
-            <h1>Upload New Data File</h1>
+            <h1>Upload Successful</h1>
         </div>
 
-        <!--        <form method="post" action="Upload" enctype="multipart/form-data">
-                    Select file to upload:
-                    <input type="file" name="dataFile" id="fileChooser"/><br/><br/>
-                    <input type="submit" value="Upload" />
-                </form>-->
 
-        <form action="Upload" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
-            <!--            <div class="form-group">
-                            <label for="pwd" class="col-sm-2 control-label">Select File to Upload</label>
-                            <div class="col-sm-10">
-                                <input type="file" name="dataFile" id="fileChooser" class="form-control">
-                            </div>
-                        </div>-->
-            <div style="position:relative;">
-                <a class='btn btn-default' href='javascript:;'>
-                    Choose File
-                    <input type="file" style='position:absolute;z-index:2;top:0;left:0;filter: alpha(opacity=0);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";opacity:0;background-color:transparent;color:transparent;' name="file_source" size="40"  onchange='$("#upload-file-info").html($(this).val());'>
-                </a>
-                &nbsp;
-                <span class='label label-info' id="upload-file-info"></span>
-            </div>
-            <span class='label label-info' id="upload-file-info"></span>
-            <p></p>
-            <p></p>
+        <h3>Your file has been uploaded!</h3>
 
-
-
-            <!--            <div class="form-group">-->
-            <!--                <div class="btn btn-primary">-->
-            <button type="submit" value="Upload" class="btn btn-default">Upload</button>
-            <!--</div>-->
-            <!--</div>-->
-        </form>
-
-
+        <p>You have successfully upload the data xml file and you will be redirect to home page in 3 seconds...</p>
+        <meta http-equiv="Refresh" content="3;url=showData.jsp">
     </div><!--container-->
 
     <footer class="footer">
         <div class="container">
-            <p class="text-muted">&copy; 2017 Independent Study &middot; <a href="#">Privacy</a>
+            <p class="text-muted">&copy; 2016 Web Technology and Standard &middot; <a href="#">Privacy</a>
                 &middot; <a href="#">Terms</a></p>
         </div>
     </footer>

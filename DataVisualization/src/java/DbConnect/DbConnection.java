@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Siwei Jiao
+ * @author Zhirun Tian
  */
 public class DbConnection {
     private static Connection connection = null;
@@ -27,7 +27,7 @@ public class DbConnection {
                  * comment or uncomment the following urls to set the one you need
                  */
 //                String url = "jdbc:mysql://localhost:3306/INFSCI2731";
-                String url = "jdbc:mysql://localhost:8889/INFSCI2731";
+                String url = "jdbc:mysql://localhost:3306/simmandebrief";
                 String user= "root";
                 String password = "root";
                 Class.forName(driver);

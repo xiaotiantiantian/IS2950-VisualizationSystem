@@ -5,14 +5,14 @@
  */
 package controller;
 
-import dataAccessObject.userDao;
+//import dataAccessObject.userDao;
+import dataAccessObject.UserInformationDao;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +25,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 /**
  *
- * @author qssheep
+ * @author Zhirun Tian
  */
 //@WebServlet(name = "Upload", urlPatterns = {"/Upload"})
 public class Upload extends HttpServlet {
@@ -40,9 +40,9 @@ public class Upload extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     private static final long serialVersionUID = 1L;
-    private static final String DATA_DIRECTORY = "image";
-    private static final int MAX_MEMORY_SIZE = 1024 * 1024 * 2;
-    private static final int MAX_REQUEST_SIZE = 1024 * 1024;
+    private static final String DATA_DIRECTORY = "XMLFiles";
+    private static final int MAX_MEMORY_SIZE = 1024 * 1024 * 20;
+    private static final int MAX_REQUEST_SIZE = 1024 * 1024 * 20;
 
     /**
      * Servlet implementation class UploadServlet
@@ -97,8 +97,11 @@ public class Upload extends HttpServlet {
                     item.write(uploadedFile);
                 }
             }
-            userDao ud = new userDao();
-            ud.changeuserpic((int) session.getAttribute("userID"), newname);
+//            userDao ud = new userDao();
+            UserInformationDao ud = new UserInformationDao();
+            int userid = ud.retrieveUser(session.getId());
+            ud.changeUserXML(userid, newname);
+//            ud.changeuserpic((int) session.getAttribute("userID"), newname);
             // displays done.jsp page after upload finished
             getServletContext().getRequestDispatcher("/done.jsp").forward(
                     request, response);
