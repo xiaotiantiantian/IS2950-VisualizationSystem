@@ -6,17 +6,23 @@
 package controller;
 
 //import dataAccessObject.userDao;
+import dataAccessObject.PatientDataDao;
 import dataAccessObject.UserInformationDao;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import model.patientBean;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -48,7 +54,9 @@ public class Upload extends HttpServlet {
      * Servlet implementation class UploadServlet
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         HttpSession session = request.getSession();
+        String filePathAll = "";
         // Check that we have a file upload request
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
@@ -91,9 +99,10 @@ public class Upload extends HttpServlet {
                     fileName = new File(item.getName()).getName();
                     newname = (String) session.getId() + fileName.substring(fileName.lastIndexOf("."));
                     String filePath = uploadFolder + File.separator + newname;
+                    filePathAll = filePath;
                     File uploadedFile = new File(filePath);
                     System.out.println(filePath);
-                    // saves the file to upload directory
+// saves the file to upload directory
                     item.write(uploadedFile);
                 }
             }
@@ -102,7 +111,7 @@ public class Upload extends HttpServlet {
             int userid = ud.retrieveUser(session.getId());
             ud.changeUserXML(userid, newname);
 //            ud.changeuserpic((int) session.getAttribute("userID"), newname);
-            // displays done.jsp page after upload finished
+// displays done.jsp page after upload finished
             getServletContext().getRequestDispatcher("/done.jsp").forward(
                     request, response);
 
@@ -110,6 +119,33 @@ public class Upload extends HttpServlet {
             throw new ServletException(ex);
         } catch (Exception ex) {
             throw new ServletException(ex);
+        }
+
+        //add a function to read xml file to database
+        try {
+             UserInformationDao ud = new UserInformationDao();
+            int userid = ud.retrieveUser(session.getId());
+
+            List<patientBean> patientList = new ArrayList<patientBean>();
+            XMLReader xmlreader = new XMLReader(filePathAll);
+
+            patientList = xmlreader.readXMLToPatientBeans();
+
+            PatientDataDao patientDao = new PatientDataDao();
+            patientDao.deleteUserEvent(userid);
+            for (int i = 0; i < patientList.size(); i++) {
+                patientDao.insertTimestampToDB(userid, patientList.get(i));
+            }
+            for (int i = 0; i < patientList.size(); i++) {
+                patientDao.updateValuesToDB(userid, patientList.get(i));
+
+            }
+//        
+//        PatientDataDao patientdataDao = new PatientDataDao(filePathAll);
+//        patientdataDao.ReadXML(filePathAll);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Upload.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
