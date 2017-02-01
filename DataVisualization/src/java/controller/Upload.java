@@ -94,8 +94,8 @@ public class Upload extends HttpServlet {
                 FileItem item = (FileItem) iter.next();
 
                 if (!item.isFormField()) {
-//                    fileName = (String)session.getId() + new File(item.getName()).getName();
-//                    String filePath = uploadFolder + File.separator + fileName;
+                    //fileName = (String)session.getId() + new File(item.getName()).getName();
+                    //String filePath = uploadFolder + File.separator + fileName;
                     fileName = new File(item.getName()).getName();
                     newname = (String) session.getId() + fileName.substring(fileName.lastIndexOf("."));
                     String filePath = uploadFolder + File.separator + newname;
@@ -108,7 +108,13 @@ public class Upload extends HttpServlet {
             }
 //            userDao ud = new userDao();
             UserInformationDao ud = new UserInformationDao();
+            //if user id is not existed (search by using username(which is session id)), add a user automaticially.
+            
+            
+            
             int userid = ud.retrieveUser(session.getId());
+            if (userid<=0)
+                userid = ud.insertUser(session.getId());
             ud.changeUserXML(userid, newname);
 //            ud.changeuserpic((int) session.getAttribute("userID"), newname);
 // displays done.jsp page after upload finished
@@ -123,7 +129,7 @@ public class Upload extends HttpServlet {
 
         //add a function to read xml file to database
         try {
-             UserInformationDao ud = new UserInformationDao();
+            UserInformationDao ud = new UserInformationDao();
             int userid = ud.retrieveUser(session.getId());
 
             List<patientBean> patientList = new ArrayList<patientBean>();

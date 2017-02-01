@@ -22,6 +22,10 @@ public class UserInformationDao {
     Statement st = null;
     ResultSet rs = null;
     String sql = "";
+    private String nonceval = "";
+    PreparedStatement ps = null;
+    int autoKey = 0;
+    
 
     public UserInformationDao() throws SQLException {
         //connect to database and select the record
@@ -30,6 +34,28 @@ public class UserInformationDao {
             System.out.println("==connection closed exception==");
         }
         System.out.println("==userInformationDao connection==");
+    }
+    
+    //if the user not exist, insert a new user id with the user name
+    public int insertUser(String name){
+       try {
+            String sql = "INSERT INTO simmandebrief.userinformation (userName) values (?)";
+
+            ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setString(1, name);
+            ps.executeUpdate();
+            
+            ResultSet rs = ps.getGeneratedKeys();
+            if(rs.next())
+                return autoKey=rs.getInt(1);
+            else
+                return 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage()) ;
+            return -1;
+        }  
     }
 
     //retrieval anyonmous user
