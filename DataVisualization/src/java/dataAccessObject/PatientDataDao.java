@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import model.patientBean;
@@ -169,6 +171,38 @@ public class PatientDataDao {
             return -1;
         }
 
+    }
+    
+    public List<patientBean> getUserHRwithTime(int userid){
+        List<patientBean> patientList= new ArrayList<patientBean>();
+        try {
+            
+            //this sql statement could only used at mysql!!!
+//            String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = '"+userid+"' and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
+            String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = ? and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
+
+//            ps = connection.prepareStatement(sql);        
+//            ps.executeQuery();
+//            ResultSet rs = st.executeQuery(sql);
+//                    ps.getGeneratedKeys();
+             PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, userid);
+            rs = ps.executeQuery();
+            while(rs.next()){
+                patientBean pB = new patientBean();
+                pB.setHours(rs.getString("hours"));
+                pB.setMinutes(rs.getString("minutes"));
+                pB.setSeconds(rs.getString("seconds"));
+                pB.setHR(rs.getInt("HR"));
+                patientList.add(pB);
+            }
+            return patientList;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return null;
+        }
     }
 
 }

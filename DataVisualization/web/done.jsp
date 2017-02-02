@@ -69,8 +69,8 @@
 
         <h3>Your file has been uploaded!</h3>
 
-        <p>You have successfully upload the data xml file and you will be redirect to home page in 3 seconds...</p>
-        <meta http-equiv="Refresh" content="3;url=showData.jsp">
+        <p>You have successfully upload the data xml file and you will be redirect to home page in 1 seconds...</p>
+        <meta http-equiv="Refresh" content="1;url=showData.jsp">
     </div><!--container-->
 
     <footer class="footer">
