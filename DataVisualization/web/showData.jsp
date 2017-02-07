@@ -50,61 +50,139 @@
                 out.println("<p>error : user not exist!</p>");
             }
 
-            patientList = pDataDao.getUserHRwithTime(userid);
-            JSONArray jsonArray = new JSONArray();
+            //deal with HR first
+//            patientList = pDataDao.getUserHRwithTime(userid);
+            JSONArray jsonArrayHR = new JSONArray();
+            patientList = pDataDao.getAllEventFromDB();
             if (patientList != null) {
-
                 for (int i = 0; i < patientList.size(); i++) {
-                    JSONObject jsonObject = new JSONObject();
-                    //HR means heart rate
-                    jsonObject.put("HR", patientList.get(i).getHR());
-                    jsonObject.put("time", patientList.get(i).getHours()
-                            //                            + ":"
-                            + patientList.get(i).getMinutes()
-                            //                            + ":"
-                            + patientList.get(i).getSeconds());
-                    jsonObject.put("userid", userid);
+                    if (patientList.get(i).getHR() != -1) {
+                        JSONObject jsonObject = new JSONObject();
+                        //HR means heart rate
+                        jsonObject.put("HR", patientList.get(i).getHR());
+                        jsonObject.put("time", patientList.get(i).getHours()
+                                //                            + ":"
+                                + patientList.get(i).getMinutes()
+                                //                            + ":"
+                                + patientList.get(i).getSeconds());
+                        jsonObject.put("userid", patientList.get(i).getUserID());
 
-                    jsonArray.put(jsonObject);
+                        jsonArrayHR.put(jsonObject);
+                    }
                 }
             }
-            //add another user information
-            //maybe an expert, but now we have no access control for expert/normal user, so just select one randomly on database
-            patientList = pDataDao.getUserHRwithTime(userid - 1);
+            //get spo2 array
+            JSONArray jsonArraySpO2 = new JSONArray();
+            patientList = pDataDao.getAllEventFromDB();
             if (patientList != null) {
-
                 for (int i = 0; i < patientList.size(); i++) {
-                    JSONObject jsonObject = new JSONObject();
-                    //HR means heart rate
-                    jsonObject.put("HR", patientList.get(i).getHR());
-                    jsonObject.put("time", patientList.get(i).getHours()
-                            //                            + ":"
-                            + patientList.get(i).getMinutes()
-                            //                            + ":"
-                            + patientList.get(i).getSeconds());
-                    jsonObject.put("userid", userid - 1);
+                    if (patientList.get(i).getSpO2() != -1) {
+                        JSONObject jsonObject = new JSONObject();
+                        //HR means heart rate
+                        jsonObject.put("SpO2", patientList.get(i).getSpO2());
+                        jsonObject.put("time", patientList.get(i).getHours()
+                                //                            + ":"
+                                + patientList.get(i).getMinutes()
+                                //                            + ":"
+                                + patientList.get(i).getSeconds());
+                       jsonObject.put("userid", patientList.get(i).getUserID());
 
-                    jsonArray.put(jsonObject);
+                        jsonArraySpO2.put(jsonObject);
+                    }
                 }
             }
-            //add another line
-            patientList = pDataDao.getUserHRwithTime(userid - 2);
+            //get BPSystolic array
+            JSONArray jsonArrayBPSystolic = new JSONArray();
+            patientList = pDataDao.getAllEventFromDB();
             if (patientList != null) {
-
                 for (int i = 0; i < patientList.size(); i++) {
-                    JSONObject jsonObject = new JSONObject();
-                    //HR means heart rate
-                    jsonObject.put("HR", patientList.get(i).getHR());
-                    jsonObject.put("time", patientList.get(i).getHours()
-                            //                            + ":"
-                            + patientList.get(i).getMinutes()
-                            //                            + ":"
-                            + patientList.get(i).getSeconds());
-                    jsonObject.put("userid", userid - 2);
+                    if (patientList.get(i).getBPSystolic() != -1) {
+                        JSONObject jsonObject = new JSONObject();
+                        //HR means heart rate
+                        jsonObject.put("BPSystolic", patientList.get(i).getBPSystolic());
+                        jsonObject.put("time", patientList.get(i).getHours()
+                                //                            + ":"
+                                + patientList.get(i).getMinutes()
+                                //                            + ":"
+                                + patientList.get(i).getSeconds());
+                       jsonObject.put("userid", patientList.get(i).getUserID());
 
-                    jsonArray.put(jsonObject);
+                        jsonArrayBPSystolic.put(jsonObject);
+                    }
                 }
             }
+            //get bpdiastolic
+            JSONArray jsonArrayBPDiastolic = new JSONArray();
+            patientList = pDataDao.getAllEventFromDB();
+            if (patientList != null) {
+                for (int i = 0; i < patientList.size(); i++) {
+                    if (patientList.get(i).getBPDiastolic() != -1) {
+                        JSONObject jsonObject = new JSONObject();
+                        //HR means heart rate
+                        jsonObject.put("HR", patientList.get(i).getBPDiastolic());
+                        jsonObject.put("time", patientList.get(i).getHours()
+                                //                            + ":"
+                                + patientList.get(i).getMinutes()
+                                //                            + ":"
+                                + patientList.get(i).getSeconds());
+                       jsonObject.put("userid", patientList.get(i).getUserID());
+                        jsonArrayBPDiastolic.put(jsonObject);
+                    }
+                }
+            }
+//            if (patientList != null) {
+//
+//                for (int i = 0; i < patientList.size(); i++) {
+//                    JSONObject jsonObject = new JSONObject();
+//                    //HR means heart rate
+//                    jsonObject.put("HR", patientList.get(i).getHR());
+//                    jsonObject.put("time", patientList.get(i).getHours()
+//                            //                            + ":"
+//                            + patientList.get(i).getMinutes()
+//                            //                            + ":"
+//                            + patientList.get(i).getSeconds());
+//                    jsonObject.put("userid", userid);
+//
+//                    jsonArray.put(jsonObject);
+//                }
+//            }
+//            //add another user information
+//            //maybe an expert, but now we have no access control for expert/normal user, so just select one randomly on database
+//            patientList = pDataDao.getUserHRwithTime(userid - 1);
+//            if (patientList != null) {
+//
+//                for (int i = 0; i < patientList.size(); i++) {
+//                    JSONObject jsonObject = new JSONObject();
+//                    //HR means heart rate
+//                    jsonObject.put("HR", patientList.get(i).getHR());
+//                    jsonObject.put("time", patientList.get(i).getHours()
+//                            //                            + ":"
+//                            + patientList.get(i).getMinutes()
+//                            //                            + ":"
+//                            + patientList.get(i).getSeconds());
+//                    jsonObject.put("userid", userid - 1);
+//
+//                    jsonArray.put(jsonObject);
+//                }
+//            }
+//            //add another line
+//            patientList = pDataDao.getUserHRwithTime(userid - 2);
+//            if (patientList != null) {
+//
+//                for (int i = 0; i < patientList.size(); i++) {
+//                    JSONObject jsonObject = new JSONObject();
+//                    //HR means heart rate
+//                    jsonObject.put("HR", patientList.get(i).getHR());
+//                    jsonObject.put("time", patientList.get(i).getHours()
+//                            //                            + ":"
+//                            + patientList.get(i).getMinutes()
+//                            //                            + ":"
+//                            + patientList.get(i).getSeconds());
+//                    jsonObject.put("userid", userid - 2);
+//
+//                    jsonArray.put(jsonObject);
+//                }
+//            }
 
 
         %>
@@ -166,7 +244,7 @@
                         function InitChart() {
                             //                        var data = [{"sale":140,"year":"000000","Client":"10"},{"sale":240,"year":"000100","Client":"10"}];
 
-                            var data = <%out.print(jsonArray.toString());%>;
+                            var data = <%out.print(jsonArrayHR.toString());%>;
 
 
 

@@ -8,6 +8,7 @@ package controller;
 //import dataAccessObject.userDao;
 import dataAccessObject.PatientDataDao;
 import dataAccessObject.UserInformationDao;
+import dataAccessObject.UserLogDao;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -86,12 +87,10 @@ public class Upload extends HttpServlet {
         // Set overall request size constraint
         upload.setSizeMax(MAX_REQUEST_SIZE);
         String fileName = "", newname = "";
-        
-         int expertiseLevel = 1;
-//                    Integer.parseInt(request.getParameter("roleChoice"));
-            int simulationID = 1;
-//                    Integer.parseInt(request.getParameter("simulationChoice"));
-        
+
+        int expertiseLevel = 1;
+        int simulationID = 1;
+
         try {
             // Parse the request
             List items = upload.parseRequest(request);
@@ -110,19 +109,20 @@ public class Upload extends HttpServlet {
                     System.out.println(filePath);
 // saves the file to upload directory
                     item.write(uploadedFile);
-                }
-                else{
-                     String name = item.getFieldName();
-                     //解决普通输入项的数据的中文乱码问题
+                } else {
+                    String name = item.getFieldName();
+                    //解决普通输入项的数据的中文乱码问题
                     String value = item.getString("UTF-8");
-                 String value1 = new String(name.getBytes("iso8859-1"),"UTF-8");
-                    System.out.println(name+"  "+value);
-                    System.out.println(name+"  "+value1);
-                    if( name.equals("roleChoice"))
+                    String value1 = new String(name.getBytes("iso8859-1"), "UTF-8");
+                    System.out.println(name + "  " + value);
+                    System.out.println(name + "  " + value1);
+                    if (name.equals("roleChoice")) {
                         expertiseLevel = Integer.parseInt(value);
-                    if(name.equals("simulationChoice"))
+                    }
+                    if (name.equals("simulationChoice")) {
                         simulationID = Integer.parseInt(value);
-                    
+                    }
+
                 }
             }
 //            userDao ud = new userDao();
@@ -147,22 +147,22 @@ public class Upload extends HttpServlet {
 
         //add a function to read xml file to database
         try {
+
             UserInformationDao ud = new UserInformationDao();
             int userid = ud.retrieveUser(session.getId());
 
             List<patientBean> patientList = new ArrayList<patientBean>();
             XMLReader xmlreader = new XMLReader(filePathAll);
 
+            //write it into log
+            UserLogDao userLogDao = new UserLogDao();
+            userLogDao.insertLog(userid, simulationID, newname, expertiseLevel);
+
             //!!**if the folder not exist ,there would have error ( could not find the file)
             patientList = xmlreader.readXMLToPatientBeans();
 
             PatientDataDao patientDao = new PatientDataDao();
             patientDao.deleteUserEvent(userid);
-//            System.out.println("roleChoice" + Integer.parseInt(request.getParameter("roleChoice")));
-//            int expertiseLevel = 1;
-////                    Integer.parseInt(request.getParameter("roleChoice"));
-//            int simulationID = 1;
-//                    Integer.parseInt(request.getParameter("simulationChoice"));
             for (int i = 0; i < patientList.size(); i++) {
                 patientDao.insertBasicInfoToDB(userid, patientList.get(i), simulationID, expertiseLevel);
             }
@@ -176,15 +176,15 @@ public class Upload extends HttpServlet {
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
-        
+
         getServletContext().getRequestDispatcher("/showData.jsp").forward(
-                    request, response);
+                request, response);
 
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doPost(request,response);
+        doPost(request, response);
     }
 
 }

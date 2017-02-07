@@ -46,20 +46,16 @@ public class PatientDataDao {
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
-
         }
-
     }
 
-    public int insertBasicInfoToDB(int userid, patientBean pB,int simulationID,int expertiseLevel) throws SQLException {
+    public int insertBasicInfoToDB(int userid, patientBean pB, int simulationID, int expertiseLevel) throws SQLException {
         try {
-            
+
             //if there is a same entry, just update, if not, inset, use userid+timestamp as unique (primary key)
-            
-            
             String sql = "INSERT INTO simmandebrief.userevent(userid, simulationID, expertiseLevel, timestamp, hours, minutes, seconds,priority ) "
                     + "select ?,?,?,?,?,?,?,? where not exists (select * from simmandebrief.userevent where userid = ? and timestamp =?)";
-            
+
 //            Select values...
 //WHERE NOT EXISTS
 //   (SELECT *
@@ -67,7 +63,6 @@ public class PatientDataDao {
 //    WHERE pk_part1 = value1,
 //        AND pk_part2 = value2)
             //  WHRE NOT EXISTS (SELECT * FROM simmandebrief.userevent WHERE userid =? and timestamp=? "
-
             ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userid);
             ps.setInt(2, simulationID);
@@ -95,13 +90,10 @@ public class PatientDataDao {
         }
     }
 
-    public int updateValuesToDB(int userid, patientBean pB,int simulationID,int expertiseLevel) throws SQLException {
+    public int updateValuesToDB(int userid, patientBean pB, int simulationID, int expertiseLevel) throws SQLException {
         sql = "update simmandebrief.userevent set ";
-
-
         if (pB.getBPDiastolic() != -1 && pB.getBPSystolic() != -1) {
             sql += " BPDiastolic = '" + pB.getBPDiastolic() + "' ";
-
             sql += ", BPSystolic = '" + pB.getBPSystolic() + "' ";
         } else if (pB.getHR() != -1) {
             sql += "HR = '" + pB.getHR() + "' ";
@@ -110,13 +102,12 @@ public class PatientDataDao {
         } else {
             return -1;
         }
-        sql += " where UserID = '" + userid + "' and timestamp = '" + pB.getTimestamp() + "' "+" and priority = '"+pB.getPriority()+"'"
-                +"and simulationID = '"+simulationID+"' and expertiseLevel = '"+expertiseLevel+"'";
+        sql += " where UserID = '" + userid + "' and timestamp = '" + pB.getTimestamp() + "' " + " and priority = '" + pB.getPriority() + "'"
+                + "and simulationID = '" + simulationID + "' and expertiseLevel = '" + expertiseLevel + "'";
 
         PreparedStatement ps1 = connection.prepareStatement(sql);
         ps1.executeUpdate();
         return 0;
-//        return -1;
     }
 
     public int deleteUserEvent(int userid) {
@@ -130,20 +121,16 @@ public class PatientDataDao {
             System.out.println(e.getMessage());
             return -1;
         }
-
     }
-    
-    public List<patientBean> getUserHRwithTime(int userid){
-        List<patientBean> patientList= new ArrayList<patientBean>();
-        try {
-            
- 
-            String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = ? and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
 
-             PreparedStatement ps = connection.prepareStatement(sql);
+    public List<patientBean> getUserHRwithTime(int userid) {
+        List<patientBean> patientList = new ArrayList<patientBean>();
+        try {
+            String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = ? and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, userid);
             rs = ps.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 patientBean pB = new patientBean();
                 pB.setHours(rs.getString("hours"));
                 pB.setMinutes(rs.getString("minutes"));
@@ -160,4 +147,32 @@ public class PatientDataDao {
         }
     }
 
+    public List<patientBean> getAllEventFromDB() {
+        List<patientBean> patientList = new ArrayList<patientBean>();
+        try {
+            String sql = "SELECT * FROM simmandebrief.userevent";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                patientBean pB = new patientBean();
+
+                pB.setUserID(rs.getInt("userID"));
+                pB.setHours(rs.getString("hours"));
+                pB.setMinutes(rs.getString("minutes"));
+                pB.setSeconds(rs.getString("seconds"));
+                pB.setHR(rs.getInt("HR"));
+                pB.setBPDiastolic(rs.getInt("BPDiastolic"));
+                pB.setBPSystolic(rs.getInt("BPSystolic"));
+                pB.setSpO2(rs.getInt("SpO2"));
+
+                patientList.add(pB);
+            }
+            return patientList;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
 }

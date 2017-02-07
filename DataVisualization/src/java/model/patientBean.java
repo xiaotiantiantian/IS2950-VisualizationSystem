@@ -10,6 +10,8 @@ package model;
  * @author Tian Zhirun
  */
 public class patientBean {
+
+    private int userID;
     private String timestamp;
     private String hours;
     private String minutes;
@@ -21,7 +23,7 @@ public class patientBean {
     private int SpO2;
 
     public patientBean() {
-         this.timestamp = "";
+        this.timestamp = "";
         this.hours = "";
         this.minutes = "";
         this.seconds = "";
@@ -30,11 +32,23 @@ public class patientBean {
         this.BPSystolic = -1;
         this.BPDiastolic = -1;
         this.SpO2 = -1;
+        this.userID = -1;
     }
-    
-    
 
     public patientBean(String timestamp, String hours, String minutes, String seconds, int priority, int HR, int BPSystolic, int BPDiastolic, int SpO2) {
+        this.timestamp = timestamp;
+        this.hours = hours;
+        this.minutes = minutes;
+        this.seconds = seconds;
+        this.priority = priority;
+        this.HR = HR;
+        this.BPSystolic = BPSystolic;
+        this.BPDiastolic = BPDiastolic;
+        this.SpO2 = SpO2;
+    }
+
+    public patientBean(int userID, String timestamp, String hours, String minutes, String seconds, int priority, int HR, int BPSystolic, int BPDiastolic, int SpO2) {
+        this.userID = userID;
         this.timestamp = timestamp;
         this.hours = hours;
         this.minutes = minutes;
@@ -52,6 +66,14 @@ public class patientBean {
 
     public void setSpO2(int SpO2) {
         this.SpO2 = SpO2;
+    }
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
 
     public int getBPDiastolic() {
@@ -117,9 +139,5 @@ public class patientBean {
     public void setBPSystolic(int BPSystolic) {
         this.BPSystolic = BPSystolic;
     }
-    
-    
-            
-            
-    
+
 }
