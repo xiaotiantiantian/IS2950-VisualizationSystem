@@ -50,65 +50,35 @@ public class PatientDataDao {
         }
 
     }
-//    public PatientDataDao(String XMLFilePath) {
-//        this.XMLFilePath = XMLFilePath;
-//    }
-//    
-//    
-//
-//    public Document parse(String filePath) {
-//        Document document = null;
-//        try {
-//            //DOM parser instance 
-//            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-//            //parse an XML file into a DOM tree 
-//            document = builder.parse(new File(filePath));
-//        } catch (ParserConfigurationException e) {
-//            e.printStackTrace();
-//        } catch (SAXException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return document;
-//    }
-//
-//    public void ReadXML(String filePath) {
-//        DOMParser parser = new DOMParser();
-//        Document document = parse(filePath);
-//        //get root element 
-//        Element rootElement = document.getDocumentElement();
-//
-//        //traverse child elements 
-//        NodeList nodes = rootElement.getChildNodes();
-//        for (int i = 0; i < nodes.getLength(); i++) {
-//            Node node = nodes.item(i);
-//            if (node.getNodeType() == Node.ELEMENT_NODE) {
-//                Element child = (Element) node;
-//                //process child element 
-//            }
-//        }
-//
-//        NodeList nodeList = rootElement.getElementsByTagName("com");
-//        if (nodeList != null) {
-//            for (int i = 0; i < nodeList.getLength(); i++) {
-//                Element element = (Element) nodeList.item(i);
-//                String id = element.getAttribute("Heart Rate");
-//            }
-//        }
-//    }
 
-    public int insertTimestampToDB(int userid, patientBean pB) throws SQLException {
+    public int insertBasicInfoToDB(int userid, patientBean pB,int simulationID,int expertiseLevel) throws SQLException {
         try {
-            String sql = "INSERT INTO simmandebrief.userevent (userid, timestamp, hours, minutes, seconds,priority ) values (?,?,?,?,?,?)";
+            
+            //if there is a same entry, just update, if not, inset, use userid+timestamp as unique (primary key)
+            
+            
+            String sql = "INSERT INTO simmandebrief.userevent(userid, simulationID, expertiseLevel, timestamp, hours, minutes, seconds,priority ) "
+                    + "select ?,?,?,?,?,?,?,? where not exists (select * from simmandebrief.userevent where userid = ? and timestamp =?)";
+            
+//            Select values...
+//WHERE NOT EXISTS
+//   (SELECT *
+//    FROM myTable
+//    WHERE pk_part1 = value1,
+//        AND pk_part2 = value2)
+            //  WHRE NOT EXISTS (SELECT * FROM simmandebrief.userevent WHERE userid =? and timestamp=? "
 
             ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userid);
-            ps.setString(2, pB.getTimestamp());
-            ps.setString(3, pB.getHours());
-            ps.setString(4, pB.getMinutes());
-            ps.setString(5, pB.getSeconds());
-            ps.setInt(6, pB.getPriority());
+            ps.setInt(2, simulationID);
+            ps.setInt(3, expertiseLevel);
+            ps.setString(4, pB.getTimestamp());
+            ps.setString(5, pB.getHours());
+            ps.setString(6, pB.getMinutes());
+            ps.setString(7, pB.getSeconds());
+            ps.setInt(8, pB.getPriority());
+            ps.setInt(9, userid);
+            ps.setString(10, pB.getTimestamp());
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
@@ -125,25 +95,14 @@ public class PatientDataDao {
         }
     }
 
-    public int updateValuesToDB(int userid, patientBean pB) throws SQLException {
+    public int updateValuesToDB(int userid, patientBean pB,int simulationID,int expertiseLevel) throws SQLException {
         sql = "update simmandebrief.userevent set ";
-//
-//        if (pB.getTimestamp()!="")
-//            sql+= " timestamp = '" + pB.getTimestamp()+"' ";
-//        if (pB.getHours() != "") {
-//            sql += " hours = '" + pB.getHours() + "' ";
-//        }
-//        if (pB.getMinutes() != "") {
-//            sql += " minutes = '" + pB.getMinutes() + "' ";
-//        }
-//        if (pB.getSeconds() != "") {
-//            sql += " seconds = '" + pB.getSeconds() + "' ";
-//        }
+
 
         if (pB.getBPDiastolic() != -1 && pB.getBPSystolic() != -1) {
             sql += " BPDiastolic = '" + pB.getBPDiastolic() + "' ";
 
-            sql += " BPSystolic = '" + pB.getBPSystolic() + "' ";
+            sql += ", BPSystolic = '" + pB.getBPSystolic() + "' ";
         } else if (pB.getHR() != -1) {
             sql += "HR = '" + pB.getHR() + "' ";
         } else if (pB.getSpO2() != -1) {
@@ -151,7 +110,8 @@ public class PatientDataDao {
         } else {
             return -1;
         }
-        sql += " where UserID = '" + userid + "' and timestamp = '" + pB.getTimestamp() + "' ";
+        sql += " where UserID = '" + userid + "' and timestamp = '" + pB.getTimestamp() + "' "+" and priority = '"+pB.getPriority()+"'"
+                +"and simulationID = '"+simulationID+"' and expertiseLevel = '"+expertiseLevel+"'";
 
         PreparedStatement ps1 = connection.prepareStatement(sql);
         ps1.executeUpdate();
@@ -177,14 +137,9 @@ public class PatientDataDao {
         List<patientBean> patientList= new ArrayList<patientBean>();
         try {
             
-            //this sql statement could only used at mysql!!!
-//            String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = '"+userid+"' and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
+ 
             String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = ? and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
 
-//            ps = connection.prepareStatement(sql);        
-//            ps.executeQuery();
-//            ResultSet rs = st.executeQuery(sql);
-//                    ps.getGeneratedKeys();
              PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, userid);
             rs = ps.executeQuery();
@@ -206,59 +161,3 @@ public class PatientDataDao {
     }
 
 }
-
-//public class PatientDataDao {
-//
-//    DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-//    //Load and parse XML file into DOM 
-//    String XMLFilePath;
-//
-//    public PatientDataDao(String XMLFilePath) {
-//        this.XMLFilePath = XMLFilePath;
-//    }
-//    
-//    
-//
-//    public Document parse(String filePath) {
-//        Document document = null;
-//        try {
-//            //DOM parser instance 
-//            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-//            //parse an XML file into a DOM tree 
-//            document = builder.parse(new File(filePath));
-//        } catch (ParserConfigurationException e) {
-//            e.printStackTrace();
-//        } catch (SAXException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return document;
-//    }
-//
-//    public void ReadXML(String filePath) {
-//        DOMParser parser = new DOMParser();
-//        Document document = parse(filePath);
-//        //get root element 
-//        Element rootElement = document.getDocumentElement();
-//
-//        //traverse child elements 
-//        NodeList nodes = rootElement.getChildNodes();
-//        for (int i = 0; i < nodes.getLength(); i++) {
-//            Node node = nodes.item(i);
-//            if (node.getNodeType() == Node.ELEMENT_NODE) {
-//                Element child = (Element) node;
-//                //process child element 
-//            }
-//        }
-//
-//        NodeList nodeList = rootElement.getElementsByTagName("com");
-//        if (nodeList != null) {
-//            for (int i = 0; i < nodeList.getLength(); i++) {
-//                Element element = (Element) nodeList.item(i);
-//                String id = element.getAttribute("Heart Rate");
-//            }
-//        }
-//    }
-//
-//}

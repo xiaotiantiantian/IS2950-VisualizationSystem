@@ -4,6 +4,10 @@
     Author     : Zhirun Tian
 --%>
 
+<%@page import="model.SimulationBean"%>
+<%@page import="java.util.List"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="dataAccessObject.SimulationDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -55,7 +59,9 @@
                             out.print("<a href='ShowUserInfo.jsp'>" + username + "</a>");
                             out.print("&nbsp;&nbsp;|&nbsp;&nbsp;");
                             out.print("<a href='LogOut'>Log Out</a>");
-                        }else out.print("Guest");
+                        } else {
+                            out.print("Guest");
+                        }
                     %>
                 </ul>
             </div><!--/.nav-collapse -->
@@ -69,20 +75,8 @@
         <div class="page-header">
             <h1>Upload New Data File</h1>
         </div>
-
-        <!--        <form method="post" action="Upload" enctype="multipart/form-data">
-                    Select file to upload:
-                    <input type="file" name="dataFile" id="fileChooser"/><br/><br/>
-                    <input type="submit" value="Upload" />
-                </form>-->
-
-        <form action="Upload" method="post" class="form-horizontal" role="form" enctype="multipart/form-data">
-            <!--            <div class="form-group">
-                            <label for="pwd" class="col-sm-2 control-label">Select File to Upload</label>
-                            <div class="col-sm-10">
-                                <input type="file" name="dataFile" id="fileChooser" class="form-control">
-                            </div>
-                        </div>-->
+        <form action="Upload" method="post" class="form-horizontal" enctype="multipart/form-data">
+            <!--role="form"--> 
             <div style="position:relative;">
                 <a class='btn btn-default' href='javascript:;'>
                     Choose File
@@ -94,11 +88,32 @@
             <span class='label label-info' id="upload-file-info"></span>
             <p></p>
             <p></p>
+            <p>Expertise Level</p>
+            <select name="roleChoice" class="form-control">
+                <option value="1">Student</option>
+                <option value ="2">Resident</option>
+                <option value ="3">Clinician</option>
+            </select>
+
+            <p></p>
+            <p></p>
+            <p>Simulation ID</p>
+            <select name ="simulationChoice" class ="form-control"> 
+
+                <%
+                    SimulationDao simulationDao = new SimulationDao();
+                    List<SimulationBean> simulationBeanList = new ArrayList<SimulationBean>();
+                    simulationBeanList = simulationDao.getAllSimulations();
+                    for (int i = 0; i < simulationBeanList.size(); i++) {%> 
+                <option value=<%=simulationBeanList.get(i).getSimID()%>><%=simulationBeanList.get(i).getTitle()%></option> 
+                <%}%> 
+            </select>
 
 
 
-            <!--            <div class="form-group">-->
-            <!--                <div class="btn btn-primary">-->
+            <p></p>
+            <p></p>
+            <p></p>
             <button type="submit" value="Upload" class="btn btn-default">Upload</button>
             <!--</div>-->
             <!--</div>-->

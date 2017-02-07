@@ -87,6 +87,25 @@
                     jsonArray.put(jsonObject);
                 }
             }
+            //add another line
+            patientList = pDataDao.getUserHRwithTime(userid - 2);
+            if (patientList != null) {
+
+                for (int i = 0; i < patientList.size(); i++) {
+                    JSONObject jsonObject = new JSONObject();
+                    //HR means heart rate
+                    jsonObject.put("HR", patientList.get(i).getHR());
+                    jsonObject.put("time", patientList.get(i).getHours()
+                            //                            + ":"
+                            + patientList.get(i).getMinutes()
+                            //                            + ":"
+                            + patientList.get(i).getSeconds());
+                    jsonObject.put("userid", userid - 2);
+
+                    jsonArray.put(jsonObject);
+                }
+            }
+
 
         %>
 
@@ -145,7 +164,7 @@
                     <script>
 
                         function InitChart() {
-    //                        var data = [{"sale":140,"year":"000000","Client":"10"},{"sale":240,"year":"000100","Client":"10"}];
+                            //                        var data = [{"sale":140,"year":"000000","Client":"10"},{"sale":240,"year":"000100","Client":"10"}];
 
                             var data = <%out.print(jsonArray.toString());%>;
 
@@ -193,10 +212,10 @@
 
 
 
-
+//6666666666666666666666666666666666666666666666666666666666666
                             vis.append("svg:g")
-                                    .attr("class", "x axis")
                                     .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                                    .attr("class", "x axis")
                                     .call(xAxis);
 
                             vis.append("svg:g")

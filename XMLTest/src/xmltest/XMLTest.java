@@ -116,6 +116,19 @@ public class XMLTest {
                 }
 
                 if (childList.item(j).getNodeName().equals("BP")) {
+                    NamedNodeMap nodenn = childList.item(j).getAttributes();
+                 
+                    for (int k = 0; k < nodenn.getLength(); k++) {
+                        Node childnn = nodenn.item(k);
+                        if (childnn.getNodeName() == "Systolic") {
+                            pB.setBPSystolic(Integer.valueOf(childnn.getNodeValue()));
+                        }
+                        if (childnn.getNodeName() == "Diastolic") {
+                            pB.setBPDiastolic(Integer.valueOf(childnn.getNodeValue()));
+                        }
+                        System.out.println(nodenn.item(k).getNodeName() + ":"
+                                + nodenn.item(k).getTextContent());
+                    }
 //                    NodeList grandchildlist = n.getElementsByTagName("logElement");
 
 ////                    
@@ -164,7 +177,5 @@ public class XMLTest {
 //            System.out.println("author: " + n.getElementsByTagName("author").item(0).getFirstChild().getNodeValue());
         System.out.println();
     }
-
-}
 
 }

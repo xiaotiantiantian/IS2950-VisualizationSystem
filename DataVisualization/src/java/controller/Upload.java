@@ -86,6 +86,12 @@ public class Upload extends HttpServlet {
         // Set overall request size constraint
         upload.setSizeMax(MAX_REQUEST_SIZE);
         String fileName = "", newname = "";
+        
+         int expertiseLevel = 1;
+//                    Integer.parseInt(request.getParameter("roleChoice"));
+            int simulationID = 1;
+//                    Integer.parseInt(request.getParameter("simulationChoice"));
+        
         try {
             // Parse the request
             List items = upload.parseRequest(request);
@@ -105,21 +111,33 @@ public class Upload extends HttpServlet {
 // saves the file to upload directory
                     item.write(uploadedFile);
                 }
+                else{
+                     String name = item.getFieldName();
+                     //解决普通输入项的数据的中文乱码问题
+                    String value = item.getString("UTF-8");
+                 String value1 = new String(name.getBytes("iso8859-1"),"UTF-8");
+                    System.out.println(name+"  "+value);
+                    System.out.println(name+"  "+value1);
+                    if( name.equals("roleChoice"))
+                        expertiseLevel = Integer.parseInt(value);
+                    if(name.equals("simulationChoice"))
+                        simulationID = Integer.parseInt(value);
+                    
+                }
             }
 //            userDao ud = new userDao();
             UserInformationDao ud = new UserInformationDao();
             //if user id is not existed (search by using username(which is session id)), add a user automaticially.
-            
-            
-            
+
             int userid = ud.retrieveUser(session.getId());
-            if (userid<=0)
+            if (userid <= 0) {
                 userid = ud.insertUser(session.getId());
+            }
             ud.changeUserXML(userid, newname);
 //            ud.changeuserpic((int) session.getAttribute("userID"), newname);
 // displays done.jsp page after upload finished
-            getServletContext().getRequestDispatcher("/done.jsp").forward(
-                    request, response);
+//            getServletContext().getRequestDispatcher("/done.jsp").forward(
+//                    request, response);
 
         } catch (FileUploadException ex) {
             throw new ServletException(ex);
@@ -135,25 +153,38 @@ public class Upload extends HttpServlet {
             List<patientBean> patientList = new ArrayList<patientBean>();
             XMLReader xmlreader = new XMLReader(filePathAll);
 
+            //!!**if the folder not exist ,there would have error ( could not find the file)
             patientList = xmlreader.readXMLToPatientBeans();
 
             PatientDataDao patientDao = new PatientDataDao();
             patientDao.deleteUserEvent(userid);
+//            System.out.println("roleChoice" + Integer.parseInt(request.getParameter("roleChoice")));
+//            int expertiseLevel = 1;
+////                    Integer.parseInt(request.getParameter("roleChoice"));
+//            int simulationID = 1;
+//                    Integer.parseInt(request.getParameter("simulationChoice"));
             for (int i = 0; i < patientList.size(); i++) {
-                patientDao.insertTimestampToDB(userid, patientList.get(i));
+                patientDao.insertBasicInfoToDB(userid, patientList.get(i), simulationID, expertiseLevel);
             }
             for (int i = 0; i < patientList.size(); i++) {
-                patientDao.updateValuesToDB(userid, patientList.get(i));
+                patientDao.updateValuesToDB(userid, patientList.get(i), simulationID, expertiseLevel);
 
             }
-//        
-//        PatientDataDao patientdataDao = new PatientDataDao(filePathAll);
-//        patientdataDao.ReadXML(filePathAll);
 
-        } catch (SQLException ex) {
-            Logger.getLogger(Upload.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException e) {
+            Logger.getLogger(Upload.class.getName()).log(Level.SEVERE, null, e);
+            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
+        
+        getServletContext().getRequestDispatcher("/showData.jsp").forward(
+                    request, response);
 
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doPost(request,response);
     }
 
 }

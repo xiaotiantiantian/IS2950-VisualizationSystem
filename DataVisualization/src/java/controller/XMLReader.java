@@ -138,47 +138,35 @@ public class XMLReader {
                             + childList.item(j).getTextContent());
                     pB.setHR(Integer.valueOf(childList.item(j).getTextContent()));
                 }
-
-                if (childList.item(j).getNodeName().equals("BP")) {
-//                    NodeList grandchildlist = n.getElementsByTagName("logElement");
-
-////                    
-////                    
-//                    NodeList grandchildList = childList.item(j).getChildNodes();
-////                    
-////                    for (int k = 0; k < grandchildList.getLength(); k++) {
-//                    if (childList.item(j).getFirstChild().equals("Systolic")) {
-//                        System.out.println("it is grandchild item :" + k);
-//                        System.out.println(childList.item(k).getNodeName() + ":"
-//                                + childList.item(k).getTextContent());
-//                        pB.setBPSystolic(Integer.valueOf(childList.item(k).getTextContent()));
-//                    }
-//                    if (childList.item(j).equals("Diastolic")) {
-//                        System.out.println("it is grandchild item :" + k);
-//                        System.out.println(childList.item(k).getNodeName() + ":"
-//                                + childList.item(k).getTextContent());
-//                        pB.setBPSystolic(Integer.valueOf(childList.item(k).getTextContent()));
-//                    }
+                
+                                if (childList.item(j).getNodeName().equals("BP")) {
+                    NamedNodeMap nodenn = childList.item(j).getAttributes();
+                 
+                    for (int k = 0; k < nodenn.getLength(); k++) {
+                        Node childnn = nodenn.item(k);
+                        if (childnn.getNodeName() == "Systolic") {
+                            pB.setBPSystolic(Integer.valueOf(childnn.getNodeValue()));
+                        }
+                        if (childnn.getNodeName() == "Diastolic") {
+                            pB.setBPDiastolic(Integer.valueOf(childnn.getNodeValue()));
+                        }
+                        System.out.println(nodenn.item(k).getNodeName() + ":"
+                                + nodenn.item(k).getTextContent());
+                    }
                 }
-
-//                    // 输出节点名称、节点值
-//                    System.out.println("it is child item :" + j);
-//                    System.out.println(childList.item(j).getNodeName() + ":"
-//                            + childList.item(j).getTextContent());
-//                    pB.setHR(Integer.valueOf(childList.item(j).getTextContent()));
             }
             patientList.add(pB);
 
         }
-        PatientDataDao patientDao = new PatientDataDao();
-        patientDao.deleteUserEvent(1);
-        for (int i = 0; i < patientList.size(); i++) {
-            patientDao.insertTimestampToDB(1, patientList.get(i));
-        }
-        for (int i = 0; i < patientList.size(); i++) {
-            patientDao.updateValuesToDB(1, patientList.get(i));
-
-        }
+//        PatientDataDao patientDao = new PatientDataDao();
+//        patientDao.deleteUserEvent(1);
+//        for (int i = 0; i < patientList.size(); i++) {
+//            patientDao.insertTimestampToDB(1, patientList.get(i));
+//        }
+//        for (int i = 0; i < patientList.size(); i++) {
+//            patientDao.updateValuesToDB(1, patientList.get(i));
+//
+//        }
 
         return patientList;
     }

@@ -70,12 +70,12 @@
         <h3>Your file has been uploaded!</h3>
 
         <p>You have successfully upload the data xml file and you will be redirect to home page in 1 seconds...</p>
-        <meta http-equiv="Refresh" content="1;url=showData.jsp">
+        <meta http-equiv="Refresh" content="0k;url=showData.jsp">
     </div><!--container-->
 
     <footer class="footer">
         <div class="container">
-            <p class="text-muted">&copy; 2016 Web Technology and Standard &middot; <a href="#">Privacy</a>
+            <p class="text-muted">&copy; 2017 Independent Study &middot; <a href="#">Privacy</a>
                 &middot; <a href="#">Terms</a></p>
         </div>
     </footer>
