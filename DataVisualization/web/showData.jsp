@@ -85,7 +85,7 @@
                                 + patientList.get(i).getMinutes()
                                 //                            + ":"
                                 + patientList.get(i).getSeconds());
-                       jsonObject.put("userid", patientList.get(i).getUserID());
+                        jsonObject.put("userid", patientList.get(i).getUserID());
 
                         jsonArraySpO2.put(jsonObject);
                     }
@@ -105,7 +105,7 @@
                                 + patientList.get(i).getMinutes()
                                 //                            + ":"
                                 + patientList.get(i).getSeconds());
-                       jsonObject.put("userid", patientList.get(i).getUserID());
+                        jsonObject.put("userid", patientList.get(i).getUserID());
 
                         jsonArrayBPSystolic.put(jsonObject);
                     }
@@ -119,72 +119,17 @@
                     if (patientList.get(i).getBPDiastolic() != -1) {
                         JSONObject jsonObject = new JSONObject();
                         //HR means heart rate
-                        jsonObject.put("HR", patientList.get(i).getBPDiastolic());
+                        jsonObject.put("BPDiastolic", patientList.get(i).getBPDiastolic());
                         jsonObject.put("time", patientList.get(i).getHours()
                                 //                            + ":"
                                 + patientList.get(i).getMinutes()
                                 //                            + ":"
                                 + patientList.get(i).getSeconds());
-                       jsonObject.put("userid", patientList.get(i).getUserID());
+                        jsonObject.put("userid", patientList.get(i).getUserID());
                         jsonArrayBPDiastolic.put(jsonObject);
                     }
                 }
             }
-//            if (patientList != null) {
-//
-//                for (int i = 0; i < patientList.size(); i++) {
-//                    JSONObject jsonObject = new JSONObject();
-//                    //HR means heart rate
-//                    jsonObject.put("HR", patientList.get(i).getHR());
-//                    jsonObject.put("time", patientList.get(i).getHours()
-//                            //                            + ":"
-//                            + patientList.get(i).getMinutes()
-//                            //                            + ":"
-//                            + patientList.get(i).getSeconds());
-//                    jsonObject.put("userid", userid);
-//
-//                    jsonArray.put(jsonObject);
-//                }
-//            }
-//            //add another user information
-//            //maybe an expert, but now we have no access control for expert/normal user, so just select one randomly on database
-//            patientList = pDataDao.getUserHRwithTime(userid - 1);
-//            if (patientList != null) {
-//
-//                for (int i = 0; i < patientList.size(); i++) {
-//                    JSONObject jsonObject = new JSONObject();
-//                    //HR means heart rate
-//                    jsonObject.put("HR", patientList.get(i).getHR());
-//                    jsonObject.put("time", patientList.get(i).getHours()
-//                            //                            + ":"
-//                            + patientList.get(i).getMinutes()
-//                            //                            + ":"
-//                            + patientList.get(i).getSeconds());
-//                    jsonObject.put("userid", userid - 1);
-//
-//                    jsonArray.put(jsonObject);
-//                }
-//            }
-//            //add another line
-//            patientList = pDataDao.getUserHRwithTime(userid - 2);
-//            if (patientList != null) {
-//
-//                for (int i = 0; i < patientList.size(); i++) {
-//                    JSONObject jsonObject = new JSONObject();
-//                    //HR means heart rate
-//                    jsonObject.put("HR", patientList.get(i).getHR());
-//                    jsonObject.put("time", patientList.get(i).getHours()
-//                            //                            + ":"
-//                            + patientList.get(i).getMinutes()
-//                            //                            + ":"
-//                            + patientList.get(i).getSeconds());
-//                    jsonObject.put("userid", userid - 2);
-//
-//                    jsonArray.put(jsonObject);
-//                }
-//            }
-
-
         %>
 
         <!-- Fixed navbar -->
@@ -233,28 +178,24 @@
             </div>
 
             <div class="container">
-
+                <h1>Show Heart Rate Data</h1>
                 <div class="jumbotron">
 
                     <svg id="visualisation" width="1000" height="500"></svg>
                     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
-
-                        function InitChart() {
-                            //                        var data = [{"sale":140,"year":"000000","Client":"10"},{"sale":240,"year":"000100","Client":"10"}];
-
-                            var data = <%out.print(jsonArrayHR.toString());%>;
-
-
-
+                        var dataHR = <%out.print(jsonArrayHR.toString());%>;
+                        var dataSpO2 = <%out.print(jsonArraySpO2.toString());%>;
+                        var dataBPDiastolic = <%out.print(jsonArrayBPDiastolic.toString());%>;
+                        var dataBPSystolic = <%out.print(jsonArrayBPSystolic.toString());%>;
+                        function InitChartHR(data) {
+//data of heart rate
                             var dataGroup = d3.nest()
                                     .key(function (d) {
                                         return d.userid;
                                     })
                                     .entries(data);
-
-
 
                             console.log(JSON.stringify(dataGroup));
 
@@ -320,6 +261,103 @@
                                         .attr('id', 'line_' + d.key)
                                         .attr('fill', 'none');
 
+                                vis.append("text")
+                                        .attr("x", (lSpace / 2) + i * lSpace)
+                                        .attr("y", HEIGHT)
+                                        .style("fill", "black")
+                                        .attr("class", "legend")
+                                        .on('click', function () {
+                                            var active = d.active ? false : true;
+                                            var opacity = active ? 0 : 1;
+
+                                            d3.select("#line_" + d.key).style("opacity", opacity);
+
+                                            d.active = active;
+                                        })
+                                        .text(d.key);
+                            });
+
+                        }
+                        InitChartHR(dataHR);
+                    </script>
+                </div>
+            </div>
+            <div class="container">
+                <h1>Show SpO2 Data</h1>
+                <div class="jumbotron">
+                    <svg id="visualisation2" width="1000" height="500"></svg>
+                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+                    <script>
+                        var dataSpO2 = <%out.print(jsonArraySpO2.toString());%>;
+
+                        function InitChartSpO2(data) {
+//data of heart rate
+                            var dataGroup = d3.nest()
+                                    .key(function (d) {
+                                        return d.userid;
+                                    })
+                                    .entries(data);
+
+                            console.log(JSON.stringify(dataGroup));
+
+                            var color = d3.scale.category10();
+
+                            var vis = d3.select("#visualisation2"),
+                                    WIDTH = 1000,
+                                    HEIGHT = 500,
+                                    MARGINS = {
+                                        top: 50,
+                                        right: 20,
+                                        bottom: 50,
+                                        left: 50
+                                    },
+                                    lSpace = WIDTH / dataGroup.length;
+
+                            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(data, function (d) {
+                                    return d.time;
+                                }), d3.max(data, function (d) {
+                                    return d.time;
+                                })]),
+                                    yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(data, function (d) {
+                                    return d.SpO2;
+                                }), d3.max(data, function (d) {
+                                    return d.SpO2;
+                                })]),
+                                    xAxis = d3.svg.axis()
+                                    .scale(xScale),
+                                    yAxis = d3.svg.axis()
+                                    .scale(yScale)
+                                    .orient("left");
+
+                            vis.append("svg:g")
+                                    .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                                    .attr("class", "x axis")
+                                    .call(xAxis);
+
+                            vis.append("svg:g")
+                                    .attr("class", "y axis")
+                                    .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                                    .call(yAxis);
+
+                            var lineGen = d3.svg.line()
+                                    .x(function (d) {
+                                        return xScale(d.time);
+                                    })
+                                    .y(function (d) {
+                                        return yScale(d.SpO2);
+                                    })
+                                    .interpolate("basis");
+
+                            dataGroup.forEach(function (d, i) {
+                                vis.append('svg:path')
+                                        .attr('d', lineGen(d.values))
+                                        .attr('stroke', function (d, j) {
+                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                        })
+                                        .attr('stroke-width', 2)
+                                        .attr('id', 'line_' + d.key)
+                                        .attr('fill', 'none');
 
                                 vis.append("text")
                                         .attr("x", (lSpace / 2) + i * lSpace)
@@ -337,19 +375,211 @@
                                         .text(d.key);
                             });
 
-
-
                         }
-
-
-
-                        InitChart();
+                        InitChartSpO2(dataSpO2);
                     </script>
                 </div>
 
             </div>
+            <div class="container">
+                <h1>Show BPDiastolic Data</h1>
+                <div class="jumbotron">
+                    <svg id="visualisationBPDiastolic" width="1000" height="500"></svg>
+                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+                    <script>
+                        var dataBPDiastolic = <%out.print(jsonArrayBPDiastolic.toString());%>;
+
+                        function InitChartBPDiastolic(data) {
+//data of heart rate
+                            var dataGroup = d3.nest()
+                                    .key(function (d) {
+                                        return d.userid;
+                                    })
+                                    .entries(data);
+
+                            console.log(JSON.stringify(dataGroup));
+
+                            var color = d3.scale.category10();
+
+                            var vis = d3.select("#visualisationBPDiastolic"),
+                                    WIDTH = 1000,
+                                    HEIGHT = 500,
+                                    MARGINS = {
+                                        top: 50,
+                                        right: 20,
+                                        bottom: 50,
+                                        left: 50
+                                    },
+                                    lSpace = WIDTH / dataGroup.length;
+
+                            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(data, function (d) {
+                                    return d.time;
+                                }), d3.max(data, function (d) {
+                                    return d.time;
+                                })]),
+                                    yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(data, function (d) {
+                                    return d.BPDiastolic;
+                                }), d3.max(data, function (d) {
+                                    return d.BPDiastolic;
+                                })]),
+                                    xAxis = d3.svg.axis()
+                                    .scale(xScale),
+                                    yAxis = d3.svg.axis()
+                                    .scale(yScale)
+                                    .orient("left");
+
+                            vis.append("svg:g")
+                                    .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                                    .attr("class", "x axis")
+                                    .call(xAxis);
+
+                            vis.append("svg:g")
+                                    .attr("class", "y axis")
+                                    .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                                    .call(yAxis);
+
+                            var lineGen = d3.svg.line()
+                                    .x(function (d) {
+                                        return xScale(d.time);
+                                    })
+                                    .y(function (d) {
+                                        return yScale(d.BPDiastolic);
+                                    })
+                                    .interpolate("basis");
+
+                            dataGroup.forEach(function (d, i) {
+                                vis.append('svg:path')
+                                        .attr('d', lineGen(d.values))
+                                        .attr('stroke', function (d, j) {
+                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                        })
+                                        .attr('stroke-width', 2)
+                                        .attr('id', 'line_' + d.key)
+                                        .attr('fill', 'none');
+
+                                vis.append("text")
+                                        .attr("x", (lSpace / 2) + i * lSpace)
+                                        .attr("y", HEIGHT)
+                                        .style("fill", "black")
+                                        .attr("class", "legend")
+                                        .on('click', function () {
+                                            var active = d.active ? false : true;
+                                            var opacity = active ? 0 : 1;
+
+                                            d3.select("#line_" + d.key).style("opacity", opacity);
+
+                                            d.active = active;
+                                        })
+                                        .text(d.key);
+                            });
+
+                        }
+                        InitChartBPDiastolic(dataBPDiastolic);
+                    </script>
+                </div>
+
+            </div>
+            <div class="container">
+                <h1>Show BPSystolic Data</h1>
+                <div class="jumbotron">
+                    <svg id="visualisationBPSystolic" width="1000" height="500"></svg>
+                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
+                    <script>
+                        var dataBPSystolic = <%out.print(jsonArrayBPSystolic.toString());%>;
 
 
+                        function InitChartBPSystolic(data) {
+//data of heart rate
+                            var dataGroup = d3.nest()
+                                    .key(function (d) {
+                                        return d.userid;
+                                    })
+                                    .entries(data);
+
+                            console.log(JSON.stringify(dataGroup));
+
+                            var color = d3.scale.category10();
+
+                            var vis = d3.select("#visualisationBPSystolic"),
+                                    WIDTH = 1000,
+                                    HEIGHT = 500,
+                                    MARGINS = {
+                                        top: 50,
+                                        right: 20,
+                                        bottom: 50,
+                                        left: 50
+                                    },
+                                    lSpace = WIDTH / dataGroup.length;
+
+                            xScale = d3.scale.linear().range([MARGINS.left, WIDTH - MARGINS.right]).domain([d3.min(data, function (d) {
+                                    return d.time;
+                                }), d3.max(data, function (d) {
+                                    return d.time;
+                                })]),
+                                    yScale = d3.scale.linear().range([HEIGHT - MARGINS.top, MARGINS.bottom]).domain([d3.min(data, function (d) {
+                                    return d.BPSystolic;
+                                }), d3.max(data, function (d) {
+                                    return d.BPSystolic;
+                                })]),
+                                    xAxis = d3.svg.axis()
+                                    .scale(xScale),
+                                    yAxis = d3.svg.axis()
+                                    .scale(yScale)
+                                    .orient("left");
+
+                            vis.append("svg:g")
+                                    .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
+                                    .attr("class", "x axis")
+                                    .call(xAxis);
+
+                            vis.append("svg:g")
+                                    .attr("class", "y axis")
+                                    .attr("transform", "translate(" + (MARGINS.left) + ",0)")
+                                    .call(yAxis);
+
+                            var lineGen = d3.svg.line()
+                                    .x(function (d) {
+                                        return xScale(d.time);
+                                    })
+                                    .y(function (d) {
+                                        return yScale(d.BPSystolic);
+                                    })
+                                    .interpolate("basis");
+
+                            dataGroup.forEach(function (d, i) {
+                                vis.append('svg:path')
+                                        .attr('d', lineGen(d.values))
+                                        .attr('stroke', function (d, j) {
+                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                        })
+                                        .attr('stroke-width', 2)
+                                        .attr('id', 'line_' + d.key)
+                                        .attr('fill', 'none');
+
+                                vis.append("text")
+                                        .attr("x", (lSpace / 2) + i * lSpace)
+                                        .attr("y", HEIGHT)
+                                        .style("fill", "black")
+                                        .attr("class", "legend")
+                                        .on('click', function () {
+                                            var active = d.active ? false : true;
+                                            var opacity = active ? 0 : 1;
+
+                                            d3.select("#line_" + d.key).style("opacity", opacity);
+
+                                            d.active = active;
+                                        })
+                                        .text(d.key);
+                            });
+
+                        }
+                        InitChartBPSystolic(dataBPSystolic);
+                    </script>
+                </div>
+
+            </div>
 
 
         </div><!--container-->
