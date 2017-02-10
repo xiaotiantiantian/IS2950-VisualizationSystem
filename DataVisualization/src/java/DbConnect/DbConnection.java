@@ -27,9 +27,10 @@ public class DbConnection {
                  * comment or uncomment the following urls to set the one you need
                  */
 //                String url = "jdbc:mysql://localhost:3306/INFSCI2731";
-                String url = "jdbc:mysql://localhost:3306/simmandebrief";
-                String user= "root";
-                String password = "root";
+//                String url = "jdbc:mysql://localhost:3306/simmandebrief";
+                String url = "jdbc:mysql://sis-teach-01.sis.pitt.edu:3306/simmandebrief";
+                String user= "simManDebrief";
+                String password = "S1mM@nD#br!f";
                 Class.forName(driver);
                 connection = DriverManager.getConnection(url, user, password);
               
