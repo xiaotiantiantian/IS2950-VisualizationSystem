@@ -35,15 +35,16 @@ public class UserLogDao {
         System.out.println("==userLogDao connection==");
     }
 
-    public int insertLog(int userID, int simulationID, String XMLPath, int expertLevel) {
+    public int insertLog(int userID, int simulationID, String XMLPath, int expertLevel,int grade) {
         try {
-            String sql = "INSERT INTO simmandebrief.userlog (userID, simulationID, XMLPath, expertLevel) values (?, ? , ?, ?)";
+            String sql = "INSERT INTO simmandebrief.userlog (userID, simulationID, XMLPath, expertLevel, grade) values (?, ? , ?, ?,?)";
 
             ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userID);
             ps.setInt(2, simulationID);
             ps.setString(3, XMLPath);
             ps.setInt(4, expertLevel);
+            ps.setInt(5, grade);
             ps.executeUpdate();
             
 

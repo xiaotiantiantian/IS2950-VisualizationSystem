@@ -90,6 +90,7 @@ public class Upload extends HttpServlet {
 
         int expertiseLevel = 1;
         int simulationID = 1;
+        int grade = -1;
 
         try {
             // Parse the request
@@ -121,6 +122,9 @@ public class Upload extends HttpServlet {
                     }
                     if (name.equals("simulationChoice")) {
                         simulationID = Integer.parseInt(value);
+                    }
+                    if(name.equals("grade")){
+                        grade = Integer.parseInt(value);
                     }
 
                 }
@@ -156,7 +160,7 @@ public class Upload extends HttpServlet {
 
             //write it into log
             UserLogDao userLogDao = new UserLogDao();
-            userLogDao.insertLog(userid, simulationID, newname, expertiseLevel);
+            userLogDao.insertLog(userid, simulationID, newname, expertiseLevel,grade);
 
             //!!**if the folder not exist ,there would have error ( could not find the file)
             patientList = xmlreader.readXMLToPatientBeans();
