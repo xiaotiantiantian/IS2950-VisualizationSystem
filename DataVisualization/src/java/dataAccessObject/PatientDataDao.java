@@ -53,8 +53,8 @@ public class PatientDataDao {
         try {
 
             //if there is a same entry, just update, if not, inset, use userid+timestamp as unique (primary key)
-            String sql = "INSERT INTO simmandebrief.userevent(userid, simulationID, expertiseLevel, timestamp, hours, minutes, seconds,priority ) "
-                    + "select ?,?,?,?,?,?,?,? where not exists (select * from simmandebrief.userevent where userid = ? and timestamp =?)";
+            String sql = "INSERT INTO simmandebrief.userevent(userid, simulationID, expertiseLevel, timestamp, hours, minutes, seconds,priority,msec ) "
+                    + "select ?,?,?,?,?,?,?,?,? where not exists (select * from simmandebrief.userevent where userid = ? and msec =?)";
 
 //            Select values...
 //WHERE NOT EXISTS
@@ -72,8 +72,17 @@ public class PatientDataDao {
             ps.setString(6, pB.getMinutes());
             ps.setString(7, pB.getSeconds());
             ps.setInt(8, pB.getPriority());
-            ps.setInt(9, userid);
-            ps.setString(10, pB.getTimestamp());
+            //old format has no msec 
+            //new format only has msec, no hours, minutes, seconds
+            Integer msec = -1;
+            if (!(pB.getHours().equals("") || pB.getMinutes().equals("") || pB.getSeconds().equals("")) && pB.getMsec() == -1) {
+                msec = (Integer.parseInt(pB.getHours()) * 60 + Integer.parseInt(pB.getMinutes())) * 60 + Integer.parseInt(pB.getSeconds());
+            }else {
+                msec = pB.getMsec();
+            }
+            ps.setInt(9, msec);
+            ps.setInt(10, userid);
+            ps.setInt(11, msec);
             ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
@@ -102,7 +111,9 @@ public class PatientDataDao {
         } else {
             return -1;
         }
-        sql += " where UserID = '" + userid + "' and timestamp = '" + pB.getTimestamp() + "' " + " and priority = '" + pB.getPriority() + "'"
+//        sql += " where UserID = '" + userid + "' and timestamp = '" + pB.getTimestamp() + "' " + " and priority = '" + pB.getPriority() + "'"
+//                + "and simulationID = '" + simulationID + "' and expertiseLevel = '" + expertiseLevel + "'";
+  sql += " where UserID = '" + userid + "' and msec = '" + pB.getMsec()+ "' " + " and priority = '" + pB.getPriority() + "'"
                 + "and simulationID = '" + simulationID + "' and expertiseLevel = '" + expertiseLevel + "'";
 
         PreparedStatement ps1 = connection.prepareStatement(sql);
@@ -126,6 +137,7 @@ public class PatientDataDao {
     public List<patientBean> getUserHRwithTime(int userid) {
         List<patientBean> patientList = new ArrayList<patientBean>();
         try {
+            //change it from using hous/minutes/seconds to msec(millisecond)
             String sql = "SELECT *, count(distinct SUBQUERY.timestamp) from( SELECT hours, minutes, seconds, HR, timestamp  FROM simmandebrief.userevent where userID = ? and HR is not null) AS SUBQUERY group by SUBQUERY.timestamp";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, userid);
@@ -160,6 +172,7 @@ public class PatientDataDao {
                 pB.setHours(rs.getString("hours"));
                 pB.setMinutes(rs.getString("minutes"));
                 pB.setSeconds(rs.getString("seconds"));
+                pB.setMsec(rs.getInt("msec"));
                 pB.setHR(rs.getInt("HR"));
                 pB.setBPDiastolic(rs.getInt("BPDiastolic"));
                 pB.setBPSystolic(rs.getInt("BPSystolic"));

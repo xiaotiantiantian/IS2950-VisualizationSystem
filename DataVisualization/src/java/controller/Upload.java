@@ -5,14 +5,13 @@
  */
 package controller;
 
-//import dataAccessObject.userDao;
-import dataAccessObject.PatientDataDao;
-import dataAccessObject.UserInformationDao;
+import dataAccessObject.DecisionTimeDao;
+import dataAccessObject.UserEventDao;
+import dataAccessObject.UserInfoDao;
 import dataAccessObject.UserLogDao;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -23,7 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import model.patientBean;
+import model.DecisionTimeBean;
+import model.UserEventBean;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
@@ -61,6 +61,13 @@ public class Upload extends HttpServlet {
         // Check that we have a file upload request
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
+        //if the folder to store xml files not exist, we should build a new dictionary;
+        String path = getServletContext().getRealPath("/");
+        System.out.println(path);
+        File XMLDirectory = new File(path + DATA_DIRECTORY);
+        //if there already have the directory, mkdir would do nothing
+        XMLDirectory.mkdir();
+
         if (!isMultipart) {
             return;
         }
@@ -91,6 +98,8 @@ public class Upload extends HttpServlet {
         int expertiseLevel = 1;
         int simulationID = 1;
         int grade = -1;
+        int xmlVersion = -1;
+        int userid = -1;
 
         try {
             // Parse the request
@@ -112,7 +121,7 @@ public class Upload extends HttpServlet {
                     item.write(uploadedFile);
                 } else {
                     String name = item.getFieldName();
-                    //解决普通输入项的数据的中文乱码问题
+                    //make chinese input correctly shown
                     String value = item.getString("UTF-8");
                     String value1 = new String(name.getBytes("iso8859-1"), "UTF-8");
                     System.out.println(name + "  " + value);
@@ -123,26 +132,25 @@ public class Upload extends HttpServlet {
                     if (name.equals("simulationChoice")) {
                         simulationID = Integer.parseInt(value);
                     }
-                    if(name.equals("grade")){
+
+                    if (name.equals("userChoice")) {
+                        userid = Integer.parseInt(value);
+                        UserInfoDao userInfoDao = new UserInfoDao();
+                        String userName = userInfoDao.getUserByID(userid);
+
+                        session.setAttribute("userName", userName);
+                        session.setAttribute("userID", userid);
+
+                    }
+                    if (name.equals("grade")) {
                         grade = Integer.parseInt(value);
+                    }
+                    if (name.equals("XMLVersion")) {
+                        xmlVersion = Integer.parseInt(value);
                     }
 
                 }
             }
-//            userDao ud = new userDao();
-            UserInformationDao ud = new UserInformationDao();
-            //if user id is not existed (search by using username(which is session id)), add a user automaticially.
-
-            int userid = ud.retrieveUser(session.getId());
-            if (userid <= 0) {
-                userid = ud.insertUser(session.getId());
-            }
-            ud.changeUserXML(userid, newname);
-//            ud.changeuserpic((int) session.getAttribute("userID"), newname);
-// displays done.jsp page after upload finished
-//            getServletContext().getRequestDispatcher("/done.jsp").forward(
-//                    request, response);
-
         } catch (FileUploadException ex) {
             throw new ServletException(ex);
         } catch (Exception ex) {
@@ -150,40 +158,73 @@ public class Upload extends HttpServlet {
         }
 
         //add a function to read xml file to database
+        //read the old version xml file
         try {
 
-            UserInformationDao ud = new UserInformationDao();
-            int userid = ud.retrieveUser(session.getId());
+            List<UserEventBean> userEventList;
+//            if (xmlVersion == 1) {
 
-            List<patientBean> patientList = new ArrayList<patientBean>();
-            XMLReader xmlreader = new XMLReader(filePathAll);
-
+//                XMLReader xmlreader = new XMLReader(filePathAll);
+//
+//                //write it into log
+//                UserLogDao userLogDao = new UserLogDao();
+//                userLogDao.insertLog(userid, simulationID, newname, expertiseLevel, grade);
+//
+//                //!!**if the folder not exist ,there would have error ( could not find the file)
+//                 patientList = xmlreader.readXMLToPatientBeans();
+//            } else /*if(xmlVersion ==2)*/{
+            XMLReaderNew xmlreaderNew = new XMLReaderNew(filePathAll);
             //write it into log
             UserLogDao userLogDao = new UserLogDao();
-            userLogDao.insertLog(userid, simulationID, newname, expertiseLevel,grade);
+            int logID = userLogDao.insertLog(userid, simulationID, newname, expertiseLevel, grade);
 
+            session.setAttribute("logID", logID);
+            xmlreaderNew.setLogID(logID);
             //!!**if the folder not exist ,there would have error ( could not find the file)
-            patientList = xmlreader.readXMLToPatientBeans();
+            userEventList = xmlreaderNew.readXMLToUserEventBeans();
 
-            PatientDataDao patientDao = new PatientDataDao();
-            patientDao.deleteUserEvent(userid);
-            for (int i = 0; i < patientList.size(); i++) {
-                patientDao.insertBasicInfoToDB(userid, patientList.get(i), simulationID, expertiseLevel);
+//            }
+            UserEventDao userEventDao = new UserEventDao();
+            int sequenceNum = 0;
+            int msec = 0;
+            int decisionTimeDelta = 0;
+
+            DecisionTimeDao decisionTimeDao = new DecisionTimeDao();
+
+            for (int i = 0; i < userEventList.size(); i++) {
+
+                //if ParamType == EventType, it is a event, a node of the tree
+                if (userEventList.get(i).getParamType().equals("EventType")) {
+
+                    if (sequenceNum == 0 || (userEventList.get(i).getMsec() - msec) != 0) {
+                        sequenceNum++;
+                        decisionTimeDelta = userEventList.get(i).getMsec() - msec;
+                        DecisionTimeBean decisionTimeBean = new DecisionTimeBean(expertiseLevel, logID, sequenceNum, decisionTimeDelta);
+                        decisionTimeDao.InserDecisionTimeIntoDB(decisionTimeBean);
+                    }
+                    msec = userEventList.get(i).getMsec();
+
+                    System.out.println("InsertEvent: Event " + i + " EventName:" + userEventList.get(i).getParamID() + " Sequence: " + sequenceNum + " DecisionTimeDelta:" + decisionTimeDelta);
+
+                }
+                userEventDao.InsertEventIntoDB(userEventList.get(i), sequenceNum, decisionTimeDelta);
             }
-            for (int i = 0; i < patientList.size(); i++) {
-                patientDao.updateValuesToDB(userid, patientList.get(i), simulationID, expertiseLevel);
-
-            }
-
         } catch (SQLException e) {
             Logger.getLogger(Upload.class.getName()).log(Level.SEVERE, null, e);
             e.printStackTrace();
             System.out.println(e.getMessage());
         }
 
-        getServletContext().getRequestDispatcher("/showData.jsp").forward(
-                request, response);
-
+        if (xmlVersion == 1) {
+            getServletContext().getRequestDispatcher("/showData.jsp").forward(
+                    request, response);
+        } else {
+            getServletContext().getRequestDispatcher("/showData2.jsp").forward(
+                    request, response);
+            
+//              getServletContext().getRequestDispatcher("/done.jsp").forward(
+//                    request, response);
+        }
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

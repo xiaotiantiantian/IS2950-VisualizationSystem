@@ -79,6 +79,7 @@ public class XMLReader {
             DocumentBuilder builder = builderFactory.newDocumentBuilder();
             //parse an XML file into a DOM tree 
             document = builder.parse(new File(XMLFilePath));
+            
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         } catch (SAXException e) {

@@ -21,6 +21,7 @@ public class patientBean {
     private int BPSystolic;
     private int BPDiastolic;
     private int SpO2;
+    private int msec;
 
     public patientBean() {
         this.timestamp = "";
@@ -33,6 +34,7 @@ public class patientBean {
         this.BPDiastolic = -1;
         this.SpO2 = -1;
         this.userID = -1;
+        this.msec = -1;
     }
 
     public patientBean(String timestamp, String hours, String minutes, String seconds, int priority, int HR, int BPSystolic, int BPDiastolic, int SpO2) {
@@ -58,6 +60,15 @@ public class patientBean {
         this.BPSystolic = BPSystolic;
         this.BPDiastolic = BPDiastolic;
         this.SpO2 = SpO2;
+    }
+
+    public patientBean(int priority, int HR, int BPSystolic, int BPDiastolic, int SpO2, int msec) {
+        this.priority = priority;
+        this.HR = HR;
+        this.BPSystolic = BPSystolic;
+        this.BPDiastolic = BPDiastolic;
+        this.SpO2 = SpO2;
+        this.msec = msec;
     }
 
     public int getSpO2() {
@@ -140,4 +151,11 @@ public class patientBean {
         this.BPSystolic = BPSystolic;
     }
 
+    public int getMsec() {
+        return msec;
+    }
+
+    public void setMsec(int msec) {
+        this.msec = msec;
+    }
 }

@@ -4,6 +4,7 @@
     Author     : Tian Zhirun
 --%>
 
+<%@page import="java.lang.Integer"%>
 <%@page import="org.json.JSONObject"%>
 <%@page import="org.json.JSONArray"%>
 <%@page import="dataAccessObject.UserInformationDao"%>
@@ -60,11 +61,14 @@
                         JSONObject jsonObject = new JSONObject();
                         //HR means heart rate
                         jsonObject.put("HR", patientList.get(i).getHR());
-                        jsonObject.put("time", patientList.get(i).getHours()
-                                //                            + ":"
-                                + patientList.get(i).getMinutes()
-                                //                            + ":"
-                                + patientList.get(i).getSeconds());
+//                        jsonObject.put("time", patientList.get(i).getHours()
+//                                //                            + ":"
+//                                + patientList.get(i).getMinutes()
+//                                //                            + ":"
+//                                + patientList.get(i).getSeconds());
+//change time to timestamp by seconds
+//                        jsonObject.put("time", (Integer.parseInt(patientList.get(i).getHours()) * 24 + Integer.parseInt(patientList.get(i).getMinutes())) * 60 + Integer.parseInt(patientList.get(i).getSeconds()));
+                       jsonObject.put("time", patientList.get(i).getMsec()/1000);
                         jsonObject.put("userid", patientList.get(i).getUserID());
 
                         jsonArrayHR.put(jsonObject);
@@ -80,11 +84,12 @@
                         JSONObject jsonObject = new JSONObject();
                         //HR means heart rate
                         jsonObject.put("SpO2", patientList.get(i).getSpO2());
-                        jsonObject.put("time", patientList.get(i).getHours()
-                                //                            + ":"
-                                + patientList.get(i).getMinutes()
-                                //                            + ":"
-                                + patientList.get(i).getSeconds());
+//                        jsonObject.put("time", patientList.get(i).getHours()
+//                                //                            + ":"
+//                                + patientList.get(i).getMinutes()
+//                                //                            + ":"
+//                                + patientList.get(i).getSeconds());
+                        jsonObject.put("time", (Integer.parseInt(patientList.get(i).getHours()) * 24 + Integer.parseInt(patientList.get(i).getMinutes())) * 60 + Integer.parseInt(patientList.get(i).getSeconds()));
                         jsonObject.put("userid", patientList.get(i).getUserID());
 
                         jsonArraySpO2.put(jsonObject);
@@ -100,11 +105,12 @@
                         JSONObject jsonObject = new JSONObject();
                         //HR means heart rate
                         jsonObject.put("BPSystolic", patientList.get(i).getBPSystolic());
-                        jsonObject.put("time", patientList.get(i).getHours()
-                                //                            + ":"
-                                + patientList.get(i).getMinutes()
-                                //                            + ":"
-                                + patientList.get(i).getSeconds());
+//                        jsonObject.put("time", patientList.get(i).getHours()
+//                                //                            + ":"
+//                                + patientList.get(i).getMinutes()
+//                                //                            + ":"
+//                                + patientList.get(i).getSeconds());
+                        jsonObject.put("time", (Integer.parseInt(patientList.get(i).getHours()) * 24 + Integer.parseInt(patientList.get(i).getMinutes())) * 60 + Integer.parseInt(patientList.get(i).getSeconds()));
                         jsonObject.put("userid", patientList.get(i).getUserID());
 
                         jsonArrayBPSystolic.put(jsonObject);
@@ -120,11 +126,13 @@
                         JSONObject jsonObject = new JSONObject();
                         //HR means heart rate
                         jsonObject.put("BPDiastolic", patientList.get(i).getBPDiastolic());
-                        jsonObject.put("time", patientList.get(i).getHours()
-                                //                            + ":"
-                                + patientList.get(i).getMinutes()
-                                //                            + ":"
-                                + patientList.get(i).getSeconds());
+//                        jsonObject.put("time", patientList.get(i).getHours()
+//                                //                            + ":"
+//                                + patientList.get(i).getMinutes()
+//                                //                            + ":"
+//                                + patientList.get(i).getSeconds());
+//var timestamp = 60*(24*Integer.parseInt(patientList.get(i).getHours())+ patientList.get(i).getMinutes())+ patientList.get(i).getSeconds();
+                        jsonObject.put("time", (Integer.parseInt(patientList.get(i).getHours()) * 24 + Integer.parseInt(patientList.get(i).getMinutes())) * 60 + Integer.parseInt(patientList.get(i).getSeconds()));
                         jsonObject.put("userid", patientList.get(i).getUserID());
                         jsonArrayBPDiastolic.put(jsonObject);
                     }
@@ -177,14 +185,18 @@
                 <h1>Show Data</h1>
             </div>
 
-            <div class="container">
-                <h1>Show Heart Rate Data</h1>
-                <div class="jumbotron">
+            <!--<div class="container">-->
+                <!--<h1>Show Heart Rate Data</h1>-->
+                <!--<div class="jumbotron">-->
 
-                    <svg id="visualisation" width="1000" height="500"></svg>
+                    <svg id="visualisationHR" class="pos_HR" width="1000" height="200"></svg>
                     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
+
                     <script>
+
+                        var color_i = 1;    //a variable to make different line has different color
+
                         var dataHR = <%out.print(jsonArrayHR.toString());%>;
                         var dataSpO2 = <%out.print(jsonArraySpO2.toString());%>;
                         var dataBPDiastolic = <%out.print(jsonArrayBPDiastolic.toString());%>;
@@ -201,14 +213,14 @@
 
                             var color = d3.scale.category10();
 
-                            var vis = d3.select("#visualisation"),
+                            var vis = d3.select("#visualisationHR"),
                                     WIDTH = 1000,
-                                    HEIGHT = 500,
+                                    HEIGHT = 200,
                                     MARGINS = {
-                                        top: 50,
-                                        right: 20,
-                                        bottom: 50,
-                                        left: 50
+                                           top: 5,
+                                        right:20 ,
+                                        bottom: 5,
+                                        left: 30
                                     },
                                     lSpace = WIDTH / dataGroup.length;
 
@@ -229,9 +241,6 @@
                                     .orient("left");
 
 
-
-
-//6666666666666666666666666666666666666666666666666666666666666
                             vis.append("svg:g")
                                     .attr("transform", "translate(0," + (HEIGHT - MARGINS.bottom) + ")")
                                     .attr("class", "x axis")
@@ -252,45 +261,48 @@
                                     .interpolate("basis");
 
                             dataGroup.forEach(function (d, i) {
+                                var id_color = function (d) {
+                                    return d.userid;
+                                };
                                 vis.append('svg:path')
                                         .attr('d', lineGen(d.values))
                                         .attr('stroke', function (d, j) {
-                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                            return "hsl(" + (++color_i) * 100 % 360 + ",100%,50%)";
                                         })
                                         .attr('stroke-width', 2)
                                         .attr('id', 'line_' + d.key)
                                         .attr('fill', 'none');
-
-                                vis.append("text")
-                                        .attr("x", (lSpace / 2) + i * lSpace)
-                                        .attr("y", HEIGHT)
-                                        .style("fill", "black")
-                                        .attr("class", "legend")
-                                        .on('click', function () {
-                                            var active = d.active ? false : true;
-                                            var opacity = active ? 0 : 1;
-
-                                            d3.select("#line_" + d.key).style("opacity", opacity);
-
-                                            d.active = active;
-                                        })
-                                        .text(d.key);
+//
+//                                vis.append("text")
+//                                        .attr("x", (lSpace / 2) + i * lSpace)
+//                                        .attr("y", HEIGHT)
+//                                        .style("fill", "black")
+//                                        .attr("class", "legend")
+//                                        .on('click', function () {
+//                                            var active = d.active ? false : true;
+//                                            var opacity = active ? 0 : 1;
+//
+//                                            d3.select("#line_" + d.key).style("opacity", opacity);
+//
+//                                            d.active = active;
+//                                        })
+//                                        .text(d.key);
                             });
 
                         }
                         InitChartHR(dataHR);
                     </script>
-                </div>
-            </div>
-            <div class="container">
-                <h1>Show SpO2 Data</h1>
-                <div class="jumbotron">
-                    <svg id="visualisation2" width="1000" height="500"></svg>
+                <!--</div>-->
+            <!--</div>-->
+            <!--<div class="container">-->
+<!--                <h1>Show SpO2 Data</h1>-->
+                <!--<div class="jumbotron">-->
+                    <svg id="visualisationSpO2" class="pos_SpO2" width="1000" height="200"></svg>
                     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
                         var dataSpO2 = <%out.print(jsonArraySpO2.toString());%>;
-
+                        color_i = 1;
                         function InitChartSpO2(data) {
 //data of heart rate
                             var dataGroup = d3.nest()
@@ -303,14 +315,18 @@
 
                             var color = d3.scale.category10();
 
-                            var vis = d3.select("#visualisation2"),
+                            var vis = d3.select("#visualisationSpO2"),
                                     WIDTH = 1000,
-                                    HEIGHT = 500,
+                                    HEIGHT = 200,
                                     MARGINS = {
-                                        top: 50,
-                                        right: 20,
-                                        bottom: 50,
-                                        left: 50
+//                                        top: 50,
+//                                        right: 20,
+//                                        bottom: 50,
+//                                        left: 50
+                                           top: 5,
+                                        right:20 ,
+                                        bottom: 5,
+                                        left: 30
                                     },
                                     lSpace = WIDTH / dataGroup.length;
 
@@ -353,43 +369,43 @@
                                 vis.append('svg:path')
                                         .attr('d', lineGen(d.values))
                                         .attr('stroke', function (d, j) {
-                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                            return "hsl(" + (++color_i) * 100 % 360 + ",100%,50%)";
                                         })
                                         .attr('stroke-width', 2)
                                         .attr('id', 'line_' + d.key)
                                         .attr('fill', 'none');
 
-                                vis.append("text")
-                                        .attr("x", (lSpace / 2) + i * lSpace)
-                                        .attr("y", HEIGHT)
-                                        .style("fill", "black")
-                                        .attr("class", "legend")
-                                        .on('click', function () {
-                                            var active = d.active ? false : true;
-                                            var opacity = active ? 0 : 1;
-
-                                            d3.select("#line_" + d.key).style("opacity", opacity);
-
-                                            d.active = active;
-                                        })
-                                        .text(d.key);
+//                                vis.append("text")
+//                                        .attr("x", (lSpace / 2) + i * lSpace)
+//                                        .attr("y", HEIGHT)
+//                                        .style("fill", "black")
+//                                        .attr("class", "legend")
+//                                        .on('click', function () {
+//                                            var active = d.active ? false : true;
+//                                            var opacity = active ? 0 : 1;
+//
+//                                            d3.select("#line_" + d.key).style("opacity", opacity);
+//
+//                                            d.active = active;
+//                                        })
+//                                        .text(d.key);
                             });
 
                         }
                         InitChartSpO2(dataSpO2);
                     </script>
-                </div>
+                <!--</div>-->
 
-            </div>
-            <div class="container">
-                <h1>Show BPDiastolic Data</h1>
-                <div class="jumbotron">
-                    <svg id="visualisationBPDiastolic" width="1000" height="500"></svg>
+            <!--</div>-->
+            <!--<div class="container">-->
+                <!--<h1>Show BPDiastolic Data</h1>-->
+                <!--<div class="jumbotron">-->
+                    <svg id="visualisationBPDiastolic" class="pos_BPDiastolic" width="1000" height="200"></svg>
                     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
                         var dataBPDiastolic = <%out.print(jsonArrayBPDiastolic.toString());%>;
-
+                        color_i = 1;
                         function InitChartBPDiastolic(data) {
 //data of heart rate
                             var dataGroup = d3.nest()
@@ -404,12 +420,12 @@
 
                             var vis = d3.select("#visualisationBPDiastolic"),
                                     WIDTH = 1000,
-                                    HEIGHT = 500,
+                                    HEIGHT = 200,
                                     MARGINS = {
-                                        top: 50,
-                                        right: 20,
-                                        bottom: 50,
-                                        left: 50
+                                          top: 5,
+                                        right:20 ,
+                                        bottom: 5,
+                                        left: 30
                                     },
                                     lSpace = WIDTH / dataGroup.length;
 
@@ -452,43 +468,43 @@
                                 vis.append('svg:path')
                                         .attr('d', lineGen(d.values))
                                         .attr('stroke', function (d, j) {
-                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                            return "hsl(" + (++color_i) * 100 % 360 + ",100%,50%)";
                                         })
                                         .attr('stroke-width', 2)
                                         .attr('id', 'line_' + d.key)
                                         .attr('fill', 'none');
 
-                                vis.append("text")
-                                        .attr("x", (lSpace / 2) + i * lSpace)
-                                        .attr("y", HEIGHT)
-                                        .style("fill", "black")
-                                        .attr("class", "legend")
-                                        .on('click', function () {
-                                            var active = d.active ? false : true;
-                                            var opacity = active ? 0 : 1;
-
-                                            d3.select("#line_" + d.key).style("opacity", opacity);
-
-                                            d.active = active;
-                                        })
-                                        .text(d.key);
+//                                vis.append("text")
+//                                        .attr("x", (lSpace / 2) + i * lSpace)
+//                                        .attr("y", HEIGHT)
+//                                        .style("fill", "black")
+//                                        .attr("class", "legend")
+//                                        .on('click', function () {
+//                                            var active = d.active ? false : true;
+//                                            var opacity = active ? 0 : 1;
+//
+//                                            d3.select("#line_" + d.key).style("opacity", opacity);
+//
+//                                            d.active = active;
+//                                        })
+//                                        .text(d.key);
                             });
 
                         }
                         InitChartBPDiastolic(dataBPDiastolic);
                     </script>
-                </div>
+                <!--</div>-->
 
-            </div>
-            <div class="container">
-                <h1>Show BPSystolic Data</h1>
-                <div class="jumbotron">
-                    <svg id="visualisationBPSystolic" width="1000" height="500"></svg>
+            <!--</div>-->
+            <!--<div class="container">-->
+                <!--<h1>Show BPSystolic Data</h1>-->
+                <!--<div class="jumbotron">-->
+                    <svg id="visualisationBPSystolic" class="pos_BPSystolic" width="1000" height="200"></svg>
                     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
                         var dataBPSystolic = <%out.print(jsonArrayBPSystolic.toString());%>;
-
+                        color_i = 1;
 
                         function InitChartBPSystolic(data) {
 //data of heart rate
@@ -504,12 +520,12 @@
 
                             var vis = d3.select("#visualisationBPSystolic"),
                                     WIDTH = 1000,
-                                    HEIGHT = 500,
+                                    HEIGHT = 200,
                                     MARGINS = {
-                                        top: 50,
-                                        right: 20,
-                                        bottom: 50,
-                                        left: 50
+                                        top: 5,
+                                        right:20 ,
+                                        bottom: 5,
+                                        left: 30
                                     },
                                     lSpace = WIDTH / dataGroup.length;
 
@@ -552,7 +568,7 @@
                                 vis.append('svg:path')
                                         .attr('d', lineGen(d.values))
                                         .attr('stroke', function (d, j) {
-                                            return "hsl(" + Math.random() * 360 + ",100%,50%)";
+                                            return "hsl(" + (++color_i) * 100 % 360 + ",100%,50%)";
                                         })
                                         .attr('stroke-width', 2)
                                         .attr('id', 'line_' + d.key)
@@ -577,26 +593,32 @@
                         }
                         InitChartBPSystolic(dataBPSystolic);
                     </script>
-                </div>
+                <!--</div>-->
 
-            </div>
-
-
-        </div><!--container-->
-
-        <footer class="footer">
+            <!--</div>-->
+<!-- <footer class="footer">
             <div class="container">
                 <p class="text-muted">&copy; 2017 Independent Study &middot; <a href="#">Privacy</a>
                     &middot; <a href="#">Terms</a></p>
             </div>
-        </footer>
+        </footer>-->
+
+        </div><!--container-->
+
+        <p> </p>
+<!--        <footer class="footer">
+            <div class="container">
+                <p class="text-muted">&copy; 2017 Independent Study &middot; <a href="#">Privacy</a>
+                    &middot; <a href="#">Terms</a></p>
+            </div>
+        </footer>-->
 
 
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <!-- Latest compiled and minified JavaScript -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-        <script src="js/formCheck.js" type="text/javascript"></script>
+<!--        <script src="js/formCheck.js" type="text/javascript"></script>-->
         <!--<script src="js/formQuestionnaireEditAdd.js?ver=2" type="text/javascript"></script>-->
     </body>
 

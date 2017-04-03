@@ -35,7 +35,7 @@ public class UserLogDao {
         System.out.println("==userLogDao connection==");
     }
 
-    public int insertLog(int userID, int simulationID, String XMLPath, int expertLevel,int grade) {
+    public int insertLog(int userID, int simulationID, String XMLPath, int expertLevel, int grade) {
         try {
             String sql = "INSERT INTO simmandebrief.userlog (userID, simulationID, XMLPath, expertLevel, grade) values (?, ? , ?, ?,?)";
 
@@ -46,7 +46,6 @@ public class UserLogDao {
             ps.setInt(4, expertLevel);
             ps.setInt(5, grade);
             ps.executeUpdate();
-            
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -61,7 +60,5 @@ public class UserLogDao {
             return -1;
         }
     }
-    
-    
 
 }

@@ -5,9 +5,11 @@
 --%>
 
 <%@page import="model.SimulationBean"%>
+<%@page import="model.UserBean"%>
 <%@page import="java.util.List"%>
 <%@page import="java.util.ArrayList"%>
 <%@page import="dataAccessObject.SimulationDao"%>
+<%@page import="dataAccessObject.UserInfoDao"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -45,7 +47,7 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
-                    <li><a href="showData.jsp">Show Data</a></li>
+                    <li><a href="showData2.jsp">Show Data</a></li>
 
                     <li class="active"><a href="upload.jsp">Upload New Data</a></li>
 
@@ -100,6 +102,18 @@
 
             <div class="form-group">
 
+                <label for="XML File Version">XML File Version</label>
+                <select name="XMLVersion" class="form-control">
+                    <!--there is some incompatibility of new and old version xml, now I change it to work with new version-->
+                    <!--<option value ="1">Old Version</option>-->
+                    <option value ="2">New Version</option>
+
+                </select>
+            </div>
+
+
+            <div class="form-group">
+
                 <label for="Simulation ID">Simulation ID</label>
                 <select name ="simulationChoice" class ="form-control"> 
 
@@ -112,6 +126,22 @@
                     <%}%> 
                 </select>
             </div>
+
+            <div class="form-group">
+
+                <label for="User ID">User Name</label>
+                <select name ="userChoice" class ="form-control"> 
+
+                    <%
+                        UserInfoDao userInfoDao = new UserInfoDao();
+                        List<UserBean> userBeanList = new ArrayList<UserBean>();
+                        userBeanList = userInfoDao.getAllUser();
+                        for (int i = 0; i < userBeanList.size(); i++) {%> 
+                    <option value=<%=userBeanList.get(i).getUserID()%>><%=userBeanList.get(i).getUserName()%></option> 
+                    <%}%> 
+                </select>
+            </div>   
+
             <div class="form-group">
                 <label for="grade">Grade:</label>
                 <input name ='grade' type="text" class="form-control" id="grade">
@@ -136,7 +166,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-    <script src="js/formCheck.js" type="text/javascript"></script>
+<!--    <script src="js/formCheck.js" type="text/javascript"></script>-->
     <!--<script src="js/formQuestionnaireEditAdd.js?ver=2" type="text/javascript"></script>-->
 </body>
 </html>

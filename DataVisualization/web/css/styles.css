@@ -218,3 +218,31 @@ button {
     stroke: none;
     fill: steelblue;
 }
+
+svg.pos_HR
+{
+position:absolute;
+left:300px;
+top:400px
+}
+
+svg.pos_SpO2
+{
+position:absolute;
+left:300px;
+top:600px
+}
+
+svg.pos_BPDiastolic
+{
+position:absolute;
+left:300px;
+top:800px
+}
+
+svg.pos_BPSystolic
+{
+position:absolute;
+left:300px;
+top:1000px
+}
