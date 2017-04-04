@@ -205,7 +205,10 @@ public class XMLReaderNew {
                     System.out.println(childNN.getNodeName() + ": " + childNN.getNodeValue());
 
                     if (childNN.getNodeName().equals("EventId")) {
-                        userEventBean.setParamID(childNN.getNodeValue());
+                        String []eventName = childNN.getNodeValue().split("\\.");
+                        
+                        
+                        userEventBean.setParamID(eventName[eventName.length-1]);
                     }
                      if (childNN.getNodeName().equals("NotInScenario")) {
                             userEventBean.setParamValue(childNN.getNodeValue());
