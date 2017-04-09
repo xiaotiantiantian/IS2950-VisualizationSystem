@@ -207,6 +207,8 @@ public class Upload extends HttpServlet {
                     System.out.println("InsertEvent: Event " + i + " EventName:" + userEventList.get(i).getParamID() + " Sequence: " + sequenceNum + " DecisionTimeDelta:" + decisionTimeDelta);
 
                 }
+//                if(i<userEventList.size()-1)
+//                    if(& userEventList.get(i).getMsec()==userEventList.get(i+1).getMsec())
                 userEventDao.InsertEventIntoDB(userEventList.get(i), sequenceNum, decisionTimeDelta);
             }
         } catch (SQLException e) {

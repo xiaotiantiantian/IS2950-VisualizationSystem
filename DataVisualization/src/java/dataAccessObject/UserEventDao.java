@@ -36,13 +36,16 @@ public class UserEventDao {
 
     public UserEventDao() throws SQLException {
         try {
-            
+
             //connect to database and select the record
             connection = DbConnection.getConnection();
             if (connection.isClosed()) {
                 System.out.println("==connection closed exception==");
             }
             System.out.println("==UserEventDao connection==");
+            
+            //combine all the eventtype data in same time and made by same logID
+            this.CombineEventInSameTime();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -52,7 +55,7 @@ public class UserEventDao {
     public int InsertEventIntoDB(UserEventBean userEventBean, int sequenceNum, int decisionTimeDelta) throws SQLException {
         try {
             String sql = "INSERT INTO simmandebrief.userevent2(logID, msec, level, paramID, paramType, paramValue, sequenceNum, decisionTimeDelta ) values (?,?,?,?,?,?,?,?)";
-            
+
             ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             ps.setInt(1, userEventBean.getLogID());
             ps.setInt(2, userEventBean.getMsec());
@@ -274,15 +277,15 @@ public class UserEventDao {
             return null;
         }
     }
-    
+
     //get all events but only paramType is events should be return
-     public List<UserEventBean> GetAllEvents(){
+    public List<UserEventBean> GetAllEvents() {
         List<UserEventBean> userEventList = new ArrayList<UserEventBean>();
         try {
             String sql = "SELECT eventID, logID, msec, level, paramID, paramType, paramValue,sequenceNum, decisionTimeDelta FROM simmandebrief.userevent2 WHERE paramType = \"EventType\" ";
 
             PreparedStatement ps = connection.prepareStatement(sql);
-        
+
             rs = ps.executeQuery();
             while (rs.next()) {
                 UserEventBean userEventBean = new UserEventBean();
@@ -306,7 +309,6 @@ public class UserEventDao {
             return null;
         }
     }
-
 
     //get maxmium sequenceNumber by logID
     public int GetMaxSequenceNumByLogID(int logID) {
@@ -384,6 +386,65 @@ public class UserEventDao {
             return null;
         }
 
+    }
+
+    public int CombineEventInSameTime() {
+        List<UserEventBean> userEventList = new ArrayList<UserEventBean>();
+        try {
+            //1.get all combined event data list 
+            String sql = "SELECT eventID, logID, msec, level, paramID, paramType, paramValue,sequenceNum, decisionTimeDelta , GROUP_CONCAT(paramID) AS decisionName "
+                    + "FROM simmandebrief.userevent2 WHERE paramType = \"EventType\"  GROUP BY logID, msec ";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                UserEventBean userEventBean = new UserEventBean();
+                userEventBean.setEventID(rs.getInt("eventID"));
+                userEventBean.setLogID(rs.getInt("logID"));
+                userEventBean.setLevel(rs.getInt("level"));
+                userEventBean.setMsec(rs.getInt("msec"));
+                userEventBean.setParamID(rs.getString("decisionName"));
+                userEventBean.setParamType(rs.getString("paramType"));
+                userEventBean.setParamValue(rs.getString("paramValue"));
+                userEventBean.setSequenceNum(rs.getInt("sequenceNum"));
+                userEventBean.setDecisionTimeDelta(rs.getInt("decisionTimeDelta"));
+                userEventList.add(userEventBean);
+
+            }
+            //2. delete all event type row in the table
+            sql = "DELETE FROM simmandebrief.userevent2 WHERE paramType = \"EventType\"";
+            ps = connection.prepareStatement(sql);
+            int result = ps.executeUpdate();
+            //3. insert all the new event data in userEventList back to table
+            for (UserEventBean userEventBean : userEventList) {
+                 sql = "INSERT INTO simmandebrief.userevent2(logID, msec, level, paramID, paramType, paramValue, sequenceNum, decisionTimeDelta ) values (?,?,?,?,?,?,?,?)";
+
+                ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+                ps.setInt(1, userEventBean.getLogID());
+                ps.setInt(2, userEventBean.getMsec());
+                ps.setInt(3, userEventBean.getLevel());
+                ps.setString(4, userEventBean.getParamID());
+                ps.setString(5, userEventBean.getParamType());
+                ps.setString(6, userEventBean.getParamValue());
+                ps.setInt(7, userEventBean.getSequenceNum());
+                ps.setInt(8, userEventBean.getDecisionTimeDelta());
+                ps.executeUpdate();
+
+                ResultSet rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    result = rs.getInt(1);
+                } else {
+                    result= 0;
+                }
+            }
+            return result;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return -1;
+        }
     }
 
 }

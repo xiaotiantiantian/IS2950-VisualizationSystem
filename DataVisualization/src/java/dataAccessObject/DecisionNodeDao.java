@@ -134,6 +134,7 @@ public class DecisionNodeDao {
 
     public List<DecisionNode> CombineDecisionNodeWithSameDecisionNameAndSameParentID(List<DecisionNode> decisionList) {
         //if two decisionNode have same decisionName and parentID, combine it. change the eventID to the smaller one
+        
         List<DecisionNode> decisionListNew = new ArrayList<DecisionNode>();
         for (DecisionNode decisionNode : decisionList) {
             //if the old list has decision item in new list with same name and parentid, just combine it
@@ -145,6 +146,9 @@ public class DecisionNodeDao {
                     List<Integer> userIDs = decisionNode.getUserIDs();
                     userIDs.addAll(decisionNodeNew.getUserIDs());
                     decisionNodeNew.setUserIDs(userIDs);
+                    //then to put the "yourTime" the larger one
+                    int yourTime = Math.max(decisionNodeNew.getYourTime(), decisionNode.getYourTime());
+                    decisionNodeNew.setYourTime(yourTime);
                     break;
                 }
             }

@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class TreeHelper {
 
+    //it only works when the tree information was given correct, or it would throw error in "json.put(map)"
     public static String getAllChildrenJSONTrees(List source, String treeid) {
         Tree tree = new Tree();
         TreeHelper.getAllChildrenTrees(source, treeid, tree);

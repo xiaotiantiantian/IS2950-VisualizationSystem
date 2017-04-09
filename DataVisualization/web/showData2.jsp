@@ -76,9 +76,9 @@
                     <!--put the name on the navigation bar-->
                     <br>
                     <%
-                        if (request.getSession().getAttribute("userName") != null) {
-                            String username = (String) session.getAttribute("userName");
-                            out.print("<a href='ShowUserInfo.jsp'>" + username + "</a>");
+                        if (request.getSession().getAttribute("logID") != null) {
+                            int logID = (Integer) session.getAttribute("logID");
+                            out.print("<a href='ShowUserInfo.jsp'>" + logID + "</a>");
                             out.print("&nbsp;&nbsp;|&nbsp;&nbsp;");
                             out.print("<a href='LogOut'>Log Out</a>");
                         } else {
@@ -91,8 +91,8 @@
     </nav>
     <%
         //create json here:
-//        int logID = (Integer) request.getSession().getAttribute("logID");
-        int logID = 102;//for test only
+        int logID = (Integer) request.getSession().getAttribute("logID");
+//        int logID = 102;//for test only
         GetDecisionNode getNode = new GetDecisionNode();
         DecisionNodeDao dnDao = new DecisionNodeDao();
         dnDao.InsertEventIntoDecisionNodeDB(logID);

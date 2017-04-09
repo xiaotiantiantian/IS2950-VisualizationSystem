@@ -137,18 +137,18 @@ public class GetDecisionNode {
         //just input the userID into that entity, and return ture
         //
         String paramID = userEventBean.getParamID();
-        for (int i = 0; i < eventList.size(); i++) {
-            if (eventList.get(i).getDecisionName().equals(paramID)&&eventList.get(i).getParentID()==userEventBean.get) {
-                List<Integer> userIDs = eventList.get(i).getUserIDs();
-                userIDs.add(userEventBean.getLogID());
-                eventList.get(i).setUserIDs(userIDs);
-                if (logID == userEventBean.getLogID()) {
-                   eventList.get(i).setYourTime(userEventBean.getDecisionTimeDelta());
-                } 
-                return true;
-            }
-
-        }
+//        for (int i = 0; i < eventList.size(); i++) {
+//            if (eventList.get(i).getDecisionName().equals(paramID)&&eventList.get(i).getParentID()) {
+//                List<Integer> userIDs = eventList.get(i).getUserIDs();
+//                userIDs.add(userEventBean.getLogID());
+//                eventList.get(i).setUserIDs(userIDs);
+//                if (logID == userEventBean.getLogID()) {
+//                   eventList.get(i).setYourTime(userEventBean.getDecisionTimeDelta());
+//                } 
+//                return true;
+//            }
+//
+//        }
 
         //if not have same name and parentID's element, just insert it into eventList, and return false
         int yourTime;
