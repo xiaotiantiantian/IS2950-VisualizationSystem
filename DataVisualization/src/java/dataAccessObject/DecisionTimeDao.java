@@ -39,16 +39,17 @@ public class DecisionTimeDao {
         }
         System.out.println("==Decision Time Dao connection==");
     }
-      public int InserDecisionTimeIntoDB( DecisionTimeBean decisionTimeBean) throws SQLException{
-        try{
-             String sql = "INSERT INTO simmandebrief.decision_time(expertLevel, logID, sequenceNum, decisionTimeDelta) values (?,?,?,?)";
-             
-             ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
-             ps.setInt(1, decisionTimeBean.getExpertLevel());
-             ps.setInt(2, decisionTimeBean.getLogID());
-             ps.setInt(3, decisionTimeBean.getSequenceNum());
-             ps.setInt(4, decisionTimeBean.getDecisionTimeDelta());
-             ps.executeUpdate();
+
+    public int InserDecisionTimeIntoDB(DecisionTimeBean decisionTimeBean) throws SQLException {
+        try {
+            String sql = "INSERT INTO simmandebrief.decision_time(expertLevel, logID, sequenceNum, decisionTimeDelta) values (?,?,?,?)";
+
+            ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            ps.setInt(1, decisionTimeBean.getExpertLevel());
+            ps.setInt(2, decisionTimeBean.getLogID());
+            ps.setInt(3, decisionTimeBean.getSequenceNum());
+            ps.setInt(4, decisionTimeBean.getDecisionTimeDelta());
+            ps.executeUpdate();
 
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -56,85 +57,116 @@ public class DecisionTimeDao {
             } else {
                 return 0;
             }
-            
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             return -1;
         }
     }
-      //get average time of all people in certain sequence
-      public int getAvgTime(int sequenceNum){
-           try{
-             String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ?";
-             
-             PreparedStatement ps = connection.prepareStatement(sql);
+    //get average time of all people in certain sequence
+
+    public int getAvgTime(int sequenceNum) {
+        try {
+            String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ?";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, sequenceNum);
             rs = ps.executeQuery();
             int resultAvgTime = -1;
             if (rs.next()) {
-               
-              resultAvgTime = rs.getInt("averageTime");
+
+                resultAvgTime = rs.getInt("averageTime");
             }
             return resultAvgTime;
-            
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             return -1;
         }
-          
-      }
-      //get average expert time
-            public int getExpertAvgTime(int sequenceNum){
-           try{
-             String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ? and expertLevel = ?";
-             
-             PreparedStatement ps = connection.prepareStatement(sql);
+
+    }
+    //get average expert time
+
+    public int getExpertAvgTime(int sequenceNum) {
+        try {
+            String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ? and expertLevel = ?";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, sequenceNum);
             ps.setInt(2, 3);    //clinician is expert? I assume so, if not, just change it. If resident means expert, change 3 to 2
             rs = ps.executeQuery();
             int resultExpertAvgTime = -1;
             if (rs.next()) {
-               
-              resultExpertAvgTime = rs.getInt("averageTime");
+
+                resultExpertAvgTime = rs.getInt("averageTime");
             }
             return resultExpertAvgTime;
-            
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             return -1;
         }
-          
-      }
- //get average cohort/student time
-            public int getCohortAvgTime(int sequenceNum){
-           try{
-             String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ? and expertLevel = ?";
-             
-             PreparedStatement ps = connection.prepareStatement(sql);
+
+    }
+    //get average cohort/student time
+
+    public int getCohortAvgTime(int sequenceNum) {
+        try {
+            String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ? and expertLevel = ?";
+
+            PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, sequenceNum);
             ps.setInt(2, 1);    //student means cohort?
             rs = ps.executeQuery();
             int resultCohortAvgTime = -1;
             if (rs.next()) {
-               
-              resultCohortAvgTime = rs.getInt("averageTime");
+
+                resultCohortAvgTime = rs.getInt("averageTime");
             }
             return resultCohortAvgTime;
-            
-    
+
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
             return -1;
         }
-          
-      }
+        
+    }
+    /**
+     *<p>get cohort average time, <br>
+     * if the user is a student, the cohort average time only calculate average of student's time
+     * if the user is a resident, the cohort average time only calcualte average of residents' time
+     * @param sequenceNum the average time in which sequence you want
+     * @param logID make the logged user's expertise level same as selection
+     * @return value of average student/resident time of certain sequence.
+     */
+    public int getCohortAvgTime(int sequenceNum, int logID) {
+        try {
+            
+            
+            String sql = "SELECT AVG(decisionTimeDelta) AS averageTime FROM simmandebrief.decision_time where sequenceNum = ? and expertLevel = "
+                    + "(SELECT expertLevel FROM simmandebrief.decision_time where logID = ? limit 1)";
 
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, sequenceNum);
+            ps.setInt(2, logID);    //student or resident?
+            rs = ps.executeQuery();
+            int resultCohortAvgTime = -1;
+            if (rs.next()) {
+
+                resultCohortAvgTime = rs.getInt("averageTime");
+            }
+            return resultCohortAvgTime;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            return -1;
+        }
+
+    }
 
 }

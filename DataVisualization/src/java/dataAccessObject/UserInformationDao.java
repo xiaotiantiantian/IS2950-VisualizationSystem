@@ -26,7 +26,10 @@ public class UserInformationDao {
     PreparedStatement ps = null;
     int autoKey = 0;
     
-
+    /**
+     *
+     * @throws SQLException
+     */
     public UserInformationDao() throws SQLException {
         //connect to database and select the record
         connection = DbConnection.getConnection();
@@ -37,6 +40,13 @@ public class UserInformationDao {
     }
     
     //if the user not exist, insert a new user id with the user name
+
+    /**
+     *<p>if the user not exist, insert a new user id with the user name<br>
+     * @param name input user name
+     * @return
+     */
+    
     public int insertUser(String name){
        try {
             String sql = "INSERT INTO simmandebrief.userinformation (userName) values (?)";

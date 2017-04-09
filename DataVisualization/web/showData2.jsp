@@ -4,6 +4,7 @@
     Author     : Tian Zhirun
 --%>
 
+<%@page import="dataAccessObject.DecisionNodeDao"%>
 <%@page import="java.time.LocalDateTime"%>
 <%@page import="model.DecisionNode"%>
 <%@page import="dataAccessObject.DecisionTimeDao"%>
@@ -90,10 +91,14 @@
     </nav>
     <%
         //create json here:
-        int logID = (Integer) request.getSession().getAttribute("logID");
-//        int logID = 84;//for test only
+//        int logID = (Integer) request.getSession().getAttribute("logID");
+        int logID = 102;//for test only
         GetDecisionNode getNode = new GetDecisionNode();
-        List<DecisionNode> decisionList = getNode.GetEventsWithParentInfo(logID);
+        DecisionNodeDao dnDao = new DecisionNodeDao();
+        dnDao.InsertEventIntoDecisionNodeDB(logID);
+        List<DecisionNode> decisionList =dnDao.GetDecisionWithAssignedParents(logID);
+        
+//        List<DecisionNode> decisionList = getNode.GetEventsWithParentInfo(logID);
         for (int i = 0; i < decisionList.size(); i++) {
             DecisionNode dN = decisionList.get(i);
             System.out.println("EventID:" + dN.getEventID() + " sequence:" + dN.getSequenceNum() + " eventName:" + dN.getDecisionName() + " parentID:" + dN.getParentID());

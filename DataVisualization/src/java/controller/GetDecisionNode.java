@@ -30,7 +30,18 @@ public class GetDecisionNode {
     public GetDecisionNode() throws SQLException {
         this.userEventDao = new UserEventDao();
     }
-
+    
+    /**
+     *<p>Get all parent relationship using database<br>
+     * @param logID logID of current User
+     * @return Decision Node List with parent information
+     */
+    public List<DecisionNode> GetEventsWithParentInfo2(int logID){
+        
+        return null;
+    }
+    
+    
     //get all the event with parent id
     //we assume each logID as a UserID(each log means a individual user)
     public List<DecisionNode> GetEventsWithParentInfo(int logID) throws SQLException {
@@ -57,19 +68,52 @@ public class GetDecisionNode {
             for (int j = 0; j < eventListOrig.size(); j++) {
                 this.cluserEvent(decisionListInside, eventListOrig.get(j), i, logID);
             }
+            
+            //decisionListInside2 is for store the new data in seq x
+            List<DecisionNode> decisionListInside2 = new ArrayList<DecisionNode>();
+            //decisionListTmp2 is for store the new data in seq x-1
+            List<DecisionNode> decisionListTmp2 = new ArrayList<DecisionNode>();
+            
+            
             //secondly, find parent node of the clusetered nodes
             //compare sequence i-1 with i, if the element in sequence i has parents, 
             //write it back to that element(from '-1' to eventID of its parent
             for (int k = 0; k < decisionListInside.size(); k++) {
-                //compare each decisionListInside node with decisionListTmp node list;
+                //compare each decisionListInside(seq x) node with decisionListTmp(seq x-1) node list;
                 decisionNode = decisionListInside.get(k);
                 for (int m = 0; m < decisionListTmp.size(); m++) {
+                    
+                    DecisionNode tmpNode = new DecisionNode();
+                    
                     //for one decision has many userIDs, there is another loop for userIDs
                     for (int n = 0; n < decisionNode.getUserIDs().size(); n++) {
                         int tmpUserID = decisionNode.getUserIDs().get(n);
+                        
+                        //collect the removed(matched) userid, when finish the loop, put it into a new decisionNode
+                        //with same information of the old node instead of the userid
+                         List<Integer> removedUserIDs = new ArrayList<Integer>();
                         if (decisionListTmp.get(m).getUserIDs().contains(tmpUserID)) {
+                            //delete the node's matched userid  (seq x-1, the inner loop)
+                            List<Integer> tmpUserIDs = decisionListTmp.get(m).getUserIDs();
+                            tmpUserIDs.remove(tmpUserID);
+                            decisionListTmp.get(m).setUserIDs(tmpUserIDs);
+                            //put the deleted note's mathced suerid into a new user node (seq x-1)
+                            int eventID = userEventDao.GetEventIDBySequenceNumAndLogID(i-1, logID);
+                            DecisionNode tmp2 = new DecisionNode(decisionListTmp.get(m));
+                            tmp2.setEventID(eventID);
+                            
+                            
+                            tmp2.setUserIDs(tmpUserIDs);
+                            
+                            
+                            
+                            
+                            
+                            
+                            
                             //write parents ID (eventID) into child's "parentID" variable
                             decisionNode.setParentID(decisionListTmp.get(m).getEventID());
+                            
                         }
                     }
 //                    if(decisionNode.getUserIDs().contains(m))
@@ -84,12 +128,17 @@ public class GetDecisionNode {
         return decisionList;
     }
 
+    //I choose to write a new method, because this function can not compare parentID between decisions, so just write a new one, so difficult to change
+    //Why I have reinvented the wheel again and again? I think it's always difficult to catch the real demand, it may beacuse I'm not smart .
     //if eventList contains certain , just put the userID into the field of this entry,else return false
     public boolean cluserEvent(List<DecisionNode> eventList, UserEventBean userEventBean, int sequenceNum, int logID) throws SQLException {
-        //if eventList has the element, just input the userID into that entity, and return ture
+        //if eventList has the element
+        //and have same parentID(elements in seq1 has the same parentID(root's id)
+        //just input the userID into that entity, and return ture
+        //
         String paramID = userEventBean.getParamID();
         for (int i = 0; i < eventList.size(); i++) {
-            if (eventList.get(i).getDecisionName().equals(paramID)) {
+            if (eventList.get(i).getDecisionName().equals(paramID)&&eventList.get(i).getParentID()==userEventBean.get) {
                 List<Integer> userIDs = eventList.get(i).getUserIDs();
                 userIDs.add(userEventBean.getLogID());
                 eventList.get(i).setUserIDs(userIDs);
@@ -101,7 +150,7 @@ public class GetDecisionNode {
 
         }
 
-        //if not have that element, just insert it into eventList, and return false
+        //if not have same name and parentID's element, just insert it into eventList, and return false
         int yourTime;
         if (logID == userEventBean.getLogID()) {
             yourTime = userEventBean.getDecisionTimeDelta();
@@ -116,7 +165,7 @@ public class GetDecisionNode {
                 -2,
                 decisionTimeDao.getAvgTime(sequenceNum),
                 decisionTimeDao.getExpertAvgTime(sequenceNum),
-                decisionTimeDao.getCohortAvgTime(sequenceNum),
+                decisionTimeDao.getCohortAvgTime(sequenceNum, logID),
                 yourTime,
                 userIDs
         );

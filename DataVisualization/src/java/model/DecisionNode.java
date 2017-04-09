@@ -5,6 +5,7 @@
  */
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -48,6 +49,22 @@ public class DecisionNode {
         this.cohortAvgTime = cohortAvgTime;
         this.yourTime = yourTime;
         this.userIDs = userIDs;
+    }
+    
+    //copy constructor......
+    public DecisionNode(DecisionNode decisionNode){
+        this.eventID = decisionNode.getEventID();
+        this.decisionName = decisionNode.getDecisionName();
+        this.sequenceNum = decisionNode.getSequenceNum();
+        this.parentID = decisionNode.getParentID();
+        this.avgTime = decisionNode.getAvgTime();
+        this.expertTime = decisionNode.getExpertTime();
+        this.cohortAvgTime = decisionNode.getCohortAvgTime();
+        this.yourTime = decisionNode.getYourTime();
+        this.userIDs = new ArrayList<Integer>();
+        for(int i =0; i< decisionNode.getUserIDs().size(); i++){
+            userIDs.add(decisionNode.getUserIDs().get(i));
+        }
     }
 
 
