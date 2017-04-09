@@ -56,9 +56,9 @@
                 <ul class="nav navbar-nav navbar-right">
                     <!--put the name on the navigation bar-->
                     <br>
-                    <%                            if (request.getSession().getAttribute("userName") != null) {
-                            String username = (String) session.getAttribute("userName");
-                            out.print("<a href='ShowUserInfo.jsp'>" + username + "</a>");
+                    <%                            if (request.getSession().getAttribute("logID") != null) {
+                            int logID = (Integer) session.getAttribute("logID");
+                            out.print("<a href='ShowUserInfo.jsp'>" + logID + "</a>");
                             out.print("&nbsp;&nbsp;|&nbsp;&nbsp;");
                             out.print("<a href='LogOut'>Log Out</a>");
                         } else {

@@ -22,8 +22,8 @@
 
         <script type="text/javascript" src="js/d3.js"></script>
         <link rel="stylesheet" type="text/css" href="css/styles.css"/>
-        <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link href="http://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
+        <link href="https://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://getbootstrap.com/examples/justified-nav/justified-nav.css" rel="stylesheet">
         <style>
             .axis path {
                 fill: none;
@@ -190,7 +190,7 @@
                 <!--<div class="jumbotron">-->
 
                     <svg id="visualisationHR" class="pos_HR" width="1000" height="200"></svg>
-                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+                    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
 
                     <script>
@@ -298,7 +298,7 @@
 <!--                <h1>Show SpO2 Data</h1>-->
                 <!--<div class="jumbotron">-->
                     <svg id="visualisationSpO2" class="pos_SpO2" width="1000" height="200"></svg>
-                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+                    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
                         var dataSpO2 = <%out.print(jsonArraySpO2.toString());%>;
@@ -401,7 +401,7 @@
                 <!--<h1>Show BPDiastolic Data</h1>-->
                 <!--<div class="jumbotron">-->
                     <svg id="visualisationBPDiastolic" class="pos_BPDiastolic" width="1000" height="200"></svg>
-                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+                    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
                         var dataBPDiastolic = <%out.print(jsonArrayBPDiastolic.toString());%>;
@@ -500,7 +500,7 @@
                 <!--<h1>Show BPSystolic Data</h1>-->
                 <!--<div class="jumbotron">-->
                     <svg id="visualisationBPSystolic" class="pos_BPSystolic" width="1000" height="200"></svg>
-                    <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+                    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 
                     <script>
                         var dataBPSystolic = <%out.print(jsonArrayBPSystolic.toString());%>;
